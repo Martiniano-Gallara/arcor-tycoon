@@ -1,0 +1,1824 @@
+/* ==========================================================================
+   MUSEO DEL SABOR — 75º ANIVERSARIO DE ARCOR (1951 - 2026)
+   Estética Triple-A de Museo 3D Tycoon Cartoon: Gran Salón, Camino Histórico,
+   Vitrinas de Cristal Iluminadas, Libro de Archivo, Oro, Chocolate y Nostalgia.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. CONTENEDOR PRINCIPAL FULLSCREEN
+   -------------------------------------------------------------------------- */
+.museum-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 5000;
+  width: 100vw;
+  height: 100vh;
+  background-color: #0c0502;
+  background-image: 
+    radial-gradient(circle at 50% 15%, rgba(255, 195, 77, 0.12) 0%, transparent 65%),
+    radial-gradient(circle at 10% 45%, rgba(138, 77, 32, 0.18) 0%, transparent 50%),
+    radial-gradient(circle at 90% 75%, rgba(184, 134, 11, 0.12) 0%, transparent 55%),
+    linear-gradient(180deg, #170b05 0%, #0a0402 100%);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  user-select: none;
+  font-family: 'Outfit', 'Nunito', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  color: #fff9ed;
+}
+
+/* --------------------------------------------------------------------------
+   2. BARRA SUPERIOR DE NAVEGACIÓN Y PATRIMONIO
+   -------------------------------------------------------------------------- */
+.museum-top-bar {
+  flex-shrink: 0;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  background: linear-gradient(180deg, rgba(38, 18, 9, 0.98) 0%, rgba(22, 10, 5, 0.96) 100%);
+  border-bottom: 3px solid #b8860b;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.8), inset 0 1px 1px rgba(255, 230, 160, 0.3);
+  backdrop-filter: blur(12px);
+  z-index: 100;
+  box-sizing: border-box;
+}
+
+.museum-bar-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+/* Botón Salir del Museo estilo Tycoon 3D */
+.museum-btn-exit {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 16px;
+  background: linear-gradient(180deg, #592e15 0%, #361908 100%);
+  border: 2px solid #d4af37;
+  border-radius: 22px;
+  color: #fff2b2;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 0.92rem;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5), inset 0 1px 2px rgba(255, 255, 255, 0.4);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.museum-btn-exit:hover {
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 6px 18px rgba(212, 175, 55, 0.5), inset 0 1px 3px #ffffff;
+  border-color: #ffd700;
+}
+
+.museum-btn-exit:active {
+  transform: translateY(1px);
+}
+
+.museum-heritage-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(212, 175, 55, 0.45);
+  border-radius: 18px;
+}
+
+.badge-beacon {
+  width: 8px;
+  height: 8px;
+  background: #ffd700;
+  border-radius: 50%;
+  box-shadow: 0 0 10px #ffd700, 0 0 18px #ffaa00;
+  animation: badgeBeaconPulse 2s infinite ease-in-out;
+}
+
+@keyframes badgeBeaconPulse {
+  0%, 100% { opacity: 0.6; transform: scale(0.9); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
+
+.badge-text {
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  color: #ffd700;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+}
+
+/* Conmutador de Vistas: Gran Salón vs Camino Histórico */
+.museum-view-selector {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(14, 6, 2, 0.7);
+  padding: 4px;
+  border-radius: 24px;
+  border: 1.5px solid rgba(212, 175, 55, 0.5);
+  box-shadow: inset 0 2px 6px rgba(0,0,0,0.6);
+}
+
+.museum-view-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 16px;
+  background: transparent;
+  border: none;
+  border-radius: 18px;
+  color: #e6c89c;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 0.88rem;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.museum-view-tab:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.museum-view-tab.active {
+  background: linear-gradient(180deg, #ffe066 0%, #d4af37 60%, #8c5816 100%);
+  color: #261103;
+  font-weight: 900;
+  box-shadow: 0 3px 12px rgba(212, 175, 55, 0.6), inset 0 1px 2px #ffffff;
+}
+
+.museum-bar-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Botón Historia / ¡Avanzar! (1 ⭐) en la Barra del Museo */
+.museum-btn-history {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 5px 16px;
+  background: linear-gradient(180deg, #6b21a8 0%, #4c1d95 60%, #2e1065 100%);
+  border: 1.8px solid rgba(216, 180, 254, 0.7);
+  border-radius: 24px;
+  color: #ffffff;
+  font-family: inherit;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5), inset 0 1px 2px rgba(255, 255, 255, 0.3);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+  position: relative;
+  overflow: hidden;
+  user-select: none;
+}
+
+.museum-btn-history:hover {
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 6px 20px rgba(168, 85, 247, 0.65), 0 0 16px rgba(216, 180, 254, 0.45);
+  border-color: #f3e8ff;
+}
+
+.museum-btn-history:active {
+  transform: translateY(1px);
+}
+
+.museum-btn-history.pulse-advance {
+  animation: museumHistoryAdvancePulse 2.4s infinite ease-in-out;
+  border-color: #facc15;
+}
+
+@keyframes museumHistoryAdvancePulse {
+  0%, 100% {
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5), 0 0 0 rgba(250, 204, 21, 0);
+  }
+  50% {
+    box-shadow: 0 6px 22px rgba(168, 85, 247, 0.75), 0 0 16px rgba(250, 204, 21, 0.65);
+  }
+}
+
+.museum-btn-history-icon {
+  font-size: 1.4rem;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.45));
+}
+
+.museum-btn-history-text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  line-height: 1.15;
+}
+
+.museum-btn-history-title {
+  font-size: 0.94rem;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: 0.2px;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+}
+
+.museum-btn-history-sub {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #e9d5ff;
+  letter-spacing: 0.2px;
+}
+
+.museum-btn-history-sub.has-stars {
+  color: #fde047;
+  text-shadow: 0 0 8px rgba(253, 224, 71, 0.75);
+}
+
+/* Botón 12 Vitrinas */
+.museum-btn-all-vitrines {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  background: linear-gradient(180deg, #3d1b09 0%, #241005 100%);
+  border: 1.5px solid #d4af37;
+  border-radius: 18px;
+  color: #ffeaa7;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.5);
+  transition: all 0.15s ease;
+}
+
+.museum-btn-all-vitrines:hover {
+  transform: translateY(-2px);
+  border-color: #ffd700;
+  background: linear-gradient(180deg, #592e15 0%, #361908 100%);
+  box-shadow: 0 4px 14px rgba(212, 175, 55, 0.4);
+}
+
+/* Contador de Colección */
+.museum-collection-counter {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 5px 14px;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1.5px solid rgba(212, 175, 55, 0.5);
+  border-radius: 20px;
+  box-shadow: inset 0 2px 6px rgba(0,0,0,0.5);
+}
+
+.counter-icon {
+  font-size: 1.25rem;
+}
+
+.counter-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.counter-val {
+  font-size: 0.95rem;
+  font-weight: 900;
+  color: #ffd700;
+  line-height: 1;
+}
+
+.counter-lbl {
+  font-size: 0.65rem;
+  color: #ccb08c;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.counter-progress-mini {
+  width: 50px;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.counter-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #ffc107, #2ecc71);
+  border-radius: 3px;
+  transition: width 0.4s ease;
+}
+
+/* Botón Audio */
+.museum-btn-audio {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.45);
+  border: 1.5px solid #d4af37;
+  color: #ffeaa7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.museum-btn-audio:hover {
+  transform: scale(1.08);
+  border-color: #ffd700;
+  background: rgba(212, 175, 55, 0.25);
+}
+
+/* --------------------------------------------------------------------------
+   3. VIEWPORT Y FRAME ESCÉNICO (1024 x 682, 3:2 FIT RESPONSIVE)
+   -------------------------------------------------------------------------- */
+.museum-stage-viewport {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+.museum-stage-frame {
+  position: relative;
+  width: min(100%, calc((100vh - 80px) * 1.501));
+  aspect-ratio: 1024 / 682;
+  max-height: calc(100vh - 80px);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 
+    0 16px 50px rgba(0, 0, 0, 0.95),
+    0 0 35px rgba(212, 175, 55, 0.25),
+    inset 0 0 20px rgba(0, 0, 0, 0.8);
+  border: 2px solid rgba(212, 175, 55, 0.4);
+  background: #120703;
+}
+
+/* Capas de Fondo Ilustradas */
+.museum-bg-layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  user-select: none;
+}
+
+.museum-bg-layer.active {
+  opacity: 1;
+}
+
+/* Canvas de Partículas Doradas */
+.museum-particles-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 15;
+}
+
+/* --------------------------------------------------------------------------
+   4. CAPA DE HOTSPOTS INTERACTIVOS
+   -------------------------------------------------------------------------- */
+.museum-hotspots-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 20;
+}
+
+.museum-hotspot {
+  position: absolute;
+  pointer-events: auto;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  outline: none;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Efecto de halo brillante sutil */
+.hotspot-beacon-glow {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  border: 2px dashed rgba(255, 215, 0, 0.35);
+  background: radial-gradient(circle at center, rgba(255, 215, 0, 0.15) 0%, transparent 70%);
+  opacity: 0.65;
+  transition: all 0.25s ease;
+  animation: beaconPulse 2.8s infinite ease-in-out;
+}
+
+@keyframes beaconPulse {
+  0%, 100% { opacity: 0.4; transform: scale(0.98); }
+  50% { opacity: 0.85; transform: scale(1.02); }
+}
+
+.museum-hotspot:hover .hotspot-beacon-glow {
+  opacity: 1;
+  border-color: #ffd700;
+  background: radial-gradient(circle at center, rgba(255, 215, 0, 0.3) 0%, transparent 80%);
+  box-shadow: 0 0 25px rgba(255, 215, 0, 0.6), inset 0 0 15px rgba(255, 215, 0, 0.3);
+}
+
+.museum-hotspot:hover {
+  transform: translateY(-3px) scale(1.02);
+}
+
+/* Pin / Etiqueta dorada flotante */
+.hotspot-pin {
+  position: absolute;
+  bottom: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  background: linear-gradient(180deg, rgba(42, 20, 9, 0.95), rgba(18, 8, 3, 0.98));
+  border: 1.5px solid #ffd700;
+  border-radius: 12px;
+  color: #fff4d1;
+  font-family: inherit;
+  font-size: 0.67rem;
+  font-weight: 800;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.8), inset 0 1px 2px rgba(255, 255, 255, 0.3);
+  pointer-events: none;
+  white-space: nowrap;
+  opacity: 0.92;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.museum-hotspot:hover .hotspot-pin {
+  opacity: 1;
+  transform: translateY(-4px) scale(1.08);
+  background: linear-gradient(180deg, #ffe066 0%, #d4af37 60%, #8c5816 100%);
+  color: #241003;
+  border-color: #ffffff;
+  box-shadow: 0 6px 16px rgba(212, 175, 55, 0.8);
+}
+
+/* --------------------------------------------------------------------------
+   5. COORDENADAS PRECISAS DE LOS HOTSPOTS EN EL GRAN SALÓN
+   -------------------------------------------------------------------------- */
+/* Hotspot 1: Muro 1950 (Fábrica Arroyito) */
+.hotspot-hall-1950 {
+  left: 2%;
+  top: 3.5%;
+  width: 23.5%;
+  height: 51%;
+}
+.hotspot-hall-1950 .hotspot-pin {
+  bottom: 12px;
+}
+
+/* Hotspot 2: Vitrina 1960 Holanda */
+.hotspot-hall-1960 {
+  left: 29.5%;
+  top: 23%;
+  width: 12%;
+  height: 47%;
+}
+
+/* Hotspot 3: Vitrina 1970 Frutales */
+.hotspot-hall-1970 {
+  left: 42%;
+  top: 25%;
+  width: 11.5%;
+  height: 45%;
+}
+
+/* Hotspot 4: Vitrina 1980 Menta */
+.hotspot-hall-1980 {
+  left: 54%;
+  top: 25%;
+  width: 11%;
+  height: 45%;
+}
+
+/* Hotspot 5: Vitrina 1990 Butter Toffees */
+.hotspot-hall-1990 {
+  left: 65.5%;
+  top: 25%;
+  width: 11%;
+  height: 45%;
+}
+
+/* Hotspot 6: Vitrina 2000 Rocklets */
+.hotspot-hall-2000 {
+  left: 77%;
+  top: 23%;
+  width: 11.5%;
+  height: 47%;
+}
+
+/* Hotspot 7: Vitrina 2020 Cofler */
+.hotspot-hall-2020 {
+  left: 89%;
+  top: 23%;
+  width: 10.5%;
+  height: 47%;
+}
+
+/* Hotspot 8: Pedestal Libro Central */
+.hotspot-hall-book {
+  left: 30%;
+  top: 72%;
+  width: 17%;
+  height: 24%;
+  border-radius: 50px;
+}
+.hotspot-beacon-ring {
+  position: absolute;
+  inset: 5%;
+  border-radius: 50%;
+  border: 2px dashed rgba(255, 215, 0, 0.4);
+  animation: bookRingRotate 20s infinite linear;
+}
+@keyframes bookRingRotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.hotspot-pin.book-pin {
+  bottom: 8px;
+  font-size: 0.72rem;
+  padding: 4px 10px;
+}
+
+/* Hotspot 8B: Pedestal Hitos y Archivo Histórico */
+.hotspot-hall-history {
+  left: 51.5%;
+  top: 72%;
+  width: 15%;
+  height: 24%;
+  border-radius: 50px;
+}
+
+.hotspot-pin.history-pin {
+  bottom: 8px;
+  font-size: 0.72rem;
+  padding: 4px 10px;
+  background: linear-gradient(180deg, rgba(88, 28, 135, 0.95) 0%, rgba(46, 16, 101, 0.96) 100%);
+  border: 1.5px solid #d8b4fe;
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6), 0 0 10px rgba(168, 85, 247, 0.5);
+}
+
+.hotspot-hall-history:hover .hotspot-pin.history-pin {
+  transform: translateX(-50%) scale(1.05);
+  border-color: #facc15;
+  box-shadow: 0 6px 18px rgba(168, 85, 247, 0.75), 0 0 14px #facc15;
+}
+
+/* Hotspot 9: Vitrina Frontal Inferior Derecha */
+.hotspot-hall-showcase {
+  left: 68%;
+  top: 69%;
+  width: 31%;
+  height: 27%;
+  border-radius: 20px;
+}
+.hotspot-pin.showcase-pin {
+  bottom: 12px;
+  font-size: 0.74rem;
+  padding: 4px 10px;
+}
+
+/* --------------------------------------------------------------------------
+   6. CHEF ARCORITO Y GLOBO DE DIÁLOGO
+   -------------------------------------------------------------------------- */
+.museum-arcorito-anchor {
+  position: absolute;
+  left: 0.5%;
+  bottom: 0.5%;
+  width: 26%;
+  height: 47%;
+  pointer-events: none;
+  z-index: 25;
+}
+
+.hotspot-arcorito-touch {
+  position: absolute;
+  inset: 0;
+  pointer-events: auto;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  outline: none;
+}
+
+.arcorito-touch-hint {
+  position: absolute;
+  top: 10%;
+  left: 24%;
+  background: #ff5722;
+  color: #ffffff;
+  padding: 2px 7px;
+  border-radius: 10px;
+  font-size: 0.65rem;
+  font-weight: 800;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+  animation: bounceHint 2s infinite ease-in-out;
+}
+
+@keyframes bounceHint {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+/* Globo de Diálogo de Arcorito */
+.museum-speech-bubble {
+  position: absolute;
+  left: 70%;
+  bottom: 30%;
+  min-width: 190px;
+  max-width: 235px;
+  padding: 10px 12px;
+  background: linear-gradient(170deg, #fffcf4 0%, #faecd2 100%);
+  border: 2.5px solid #8c5816;
+  border-radius: 16px;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.7), 0 0 12px rgba(212, 175, 55, 0.35);
+  color: #2b1305;
+  pointer-events: auto;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  animation: bubblePop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes bubblePop {
+  0% { transform: scale(0.6) translateY(20px); opacity: 0; }
+  100% { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+.museum-speech-bubble:hover {
+  transform: scale(1.03) translateY(-2px);
+  box-shadow: 0 12px 26px rgba(0, 0, 0, 0.8), 0 0 18px rgba(255, 215, 0, 0.5);
+}
+
+/* Cola del globo apuntando a Arcorito */
+.museum-speech-bubble::after {
+  content: '';
+  position: absolute;
+  left: -10px;
+  bottom: 20px;
+  width: 0;
+  height: 0;
+  border-top: 8px solid transparent;
+  border-bottom: 8px solid transparent;
+  border-right: 10px solid #fffcf4;
+  filter: drop-shadow(-2px 1px 0 #8c5816);
+}
+
+.bubble-sparkle {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  font-size: 1rem;
+}
+
+.bubble-text {
+  margin: 0;
+  font-size: 0.77rem;
+  font-weight: 700;
+  line-height: 1.32;
+  color: #2b1305;
+}
+
+.bubble-subhint {
+  display: block;
+  margin-top: 5px;
+  font-size: 0.62rem;
+  font-weight: 800;
+  color: #a05e1a;
+  text-align: right;
+}
+
+/* --------------------------------------------------------------------------
+   7. NODOS DEL CAMINO HISTÓRICO (LÍNEA DE TIEMPO)
+   -------------------------------------------------------------------------- */
+.museum-path-node {
+  position: absolute;
+  pointer-events: auto;
+  background: radial-gradient(circle at center, rgba(255, 215, 0, 0.25) 0%, rgba(212, 175, 55, 0.08) 60%, transparent 80%);
+  border: 2px dashed rgba(255, 215, 0, 0.6);
+  border-radius: 50%;
+  color: #fff9df;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: inherit;
+  cursor: pointer;
+  box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.2s ease, border-color 0.2s ease;
+}
+
+.museum-path-node:hover {
+  transform: translateY(-4px) scale(1.12);
+  background: radial-gradient(circle at center, rgba(255, 215, 0, 0.65) 0%, rgba(212, 175, 55, 0.3) 70%, transparent 90%);
+  border: 2.5px solid #ffffff;
+  box-shadow: 0 0 25px rgba(255, 215, 0, 0.9), 0 0 40px rgba(255, 170, 0, 0.5);
+}
+
+.path-node-num {
+  display: none;
+}
+
+.path-node-label {
+  position: absolute;
+  top: -24px;
+  background: rgba(26, 12, 5, 0.95);
+  border: 1.5px solid #ffd700;
+  border-radius: 12px;
+  padding: 2px 8px;
+  font-size: 0.68rem;
+  font-weight: 800;
+  color: #fff4d1;
+  white-space: nowrap;
+  pointer-events: none;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.7);
+  opacity: 0.9;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.museum-path-node:hover .path-node-label {
+  opacity: 1;
+  transform: translateY(-2px);
+  background: #ffd700;
+  color: #241003;
+  border-color: #ffffff;
+}
+
+/* Posiciones de los nodos sobre museo_path_bg.jpg */
+.museum-path-node.node-1 {
+  left: 20%;
+  top: 66%;
+  width: 9.5%;
+  height: 14%;
+}
+
+.museum-path-node.node-2 {
+  left: 35.5%;
+  top: 59%;
+  width: 8.5%;
+  height: 13%;
+}
+
+.museum-path-node.node-3 {
+  left: 46.5%;
+  top: 52%;
+  width: 7.5%;
+  height: 12%;
+}
+
+.museum-path-node.node-4a {
+  left: 47%;
+  top: 64%;
+  width: 8.5%;
+  height: 12%;
+}
+
+.museum-path-node.node-4b {
+  left: 59%;
+  top: 63%;
+  width: 8.5%;
+  height: 12%;
+}
+
+.museum-path-node.node-5 {
+  left: 73.5%;
+  top: 65%;
+  width: 8.5%;
+  height: 12%;
+}
+
+.museum-path-node.node-6 {
+  left: 88.5%;
+  top: 70%;
+  width: 9.5%;
+  height: 13%;
+}
+
+.museum-path-book-btn {
+  position: absolute;
+  left: 68.5%;
+  top: 75%;
+  width: 19%;
+  height: 21%;
+  pointer-events: auto;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* --------------------------------------------------------------------------
+   8. MODAL DE ZOOM DE FOTO HISTÓRICA 1951
+   -------------------------------------------------------------------------- */
+.museum-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 4, 2, 0.88);
+  backdrop-filter: blur(8px);
+  z-index: 6000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: museumFadeIn 0.25s ease-out;
+  box-sizing: border-box;
+}
+
+@keyframes museumFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.photo-zoom-dialog {
+  position: relative;
+  max-width: 800px;
+  width: 100%;
+  background: linear-gradient(165deg, #2b1407 0%, #120803 100%);
+  border: 4px solid #d4af37;
+  border-radius: 24px;
+  box-shadow: 0 25px 60px rgba(0,0,0,0.95), 0 0 35px rgba(212, 175, 55, 0.4);
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  box-sizing: border-box;
+}
+
+.photo-zoom-header {
+  text-align: center;
+}
+
+.zoom-badge {
+  display: inline-block;
+  font-size: 0.75rem;
+  letter-spacing: 2px;
+  color: #ffd700;
+  font-weight: 800;
+  margin-bottom: 4px;
+}
+
+.zoom-title {
+  margin: 0;
+  font-size: 1.6rem;
+  font-weight: 900;
+  color: #ffffff;
+}
+
+.zoom-image-wrapper {
+  position: relative;
+  width: 100%;
+  max-height: 380px;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+  border: 3px solid #8c5816;
+}
+
+.zoom-big-photo {
+  width: 100%;
+  height: 100%;
+  max-height: 380px;
+  object-fit: contain;
+  background: #000;
+  display: block;
+}
+
+.zoom-photo-caption {
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: #fff4d1;
+}
+
+.zoom-photo-caption strong {
+  color: #ffd700;
+}
+
+.zoom-quote-row {
+  margin-top: 12px;
+  padding: 10px 14px;
+  background: rgba(255, 215, 0, 0.1);
+  border-left: 3px solid #ffd700;
+  border-radius: 0 8px 8px 0;
+  font-style: italic;
+  font-size: 0.88rem;
+  color: #fffbe6;
+}
+
+.zoom-quote-author {
+  display: block;
+  font-weight: 800;
+  font-style: normal;
+  color: #ffd700;
+  margin-top: 4px;
+  text-align: right;
+  font-size: 0.8rem;
+}
+
+.zoom-actions {
+  margin-top: 12px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.btn-zoom-open-book {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 20px;
+  background: linear-gradient(180deg, #ffd700, #b8860b);
+  border: 2px solid #ffffff;
+  border-radius: 20px;
+  color: #241003;
+  font-family: inherit;
+  font-weight: 800;
+  font-size: 0.9rem;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.5);
+  transition: all 0.15s ease;
+}
+
+.btn-zoom-open-book:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(255, 215, 0, 0.8);
+}
+
+/* --------------------------------------------------------------------------
+   9. CATÁLOGO / MODAL DE LAS 12 VITRINAS DE ORO
+   -------------------------------------------------------------------------- */
+.all-vitrines-dialog {
+  position: relative;
+  max-width: 980px;
+  width: 100%;
+  max-height: 88vh;
+  background: linear-gradient(165deg, #2b1407 0%, #140803 100%);
+  border: 4px solid #d4af37;
+  border-radius: 28px;
+  box-shadow: 0 25px 60px rgba(0,0,0,0.95), 0 0 40px rgba(212, 175, 55, 0.4);
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.all-vitrines-header {
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.vitrines-crest {
+  font-size: 0.85rem;
+  letter-spacing: 3px;
+  color: #ffd700;
+  font-weight: 900;
+}
+
+.vitrines-modal-title {
+  margin: 4px 0;
+  font-size: 1.8rem;
+  font-weight: 900;
+  color: #ffffff;
+}
+
+.vitrines-modal-sub {
+  margin: 0 0 10px 0;
+  font-size: 0.88rem;
+  color: #e6c89c;
+}
+
+.vitrines-progress-pill {
+  display: inline-block;
+  padding: 4px 16px;
+  background: rgba(212, 175, 55, 0.2);
+  border: 1px solid #ffd700;
+  border-radius: 16px;
+  font-weight: 800;
+  font-size: 0.82rem;
+  color: #ffd700;
+}
+
+.vitrines-grid-scroll {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(195px, 1fr));
+  gap: 16px;
+  padding: 8px 6px;
+}
+
+.vitrines-grid-scroll::-webkit-scrollbar {
+  width: 8px;
+}
+.vitrines-grid-scroll::-webkit-scrollbar-thumb {
+  background: #b8860b;
+  border-radius: 4px;
+}
+
+.vitrine-catalog-card {
+  background: linear-gradient(180deg, rgba(34, 15, 6, 0.75) 0%, rgba(18, 8, 3, 0.9) 100%);
+  border: 2px solid rgba(212, 175, 55, 0.4);
+  border-radius: 18px;
+  padding: 14px 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 10px;
+  min-height: 280px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.vitrine-catalog-card:hover {
+  transform: translateY(-4px);
+  border-color: #ffd700;
+  background: rgba(42, 20, 9, 0.75);
+  box-shadow: 0 8px 20px rgba(212, 175, 55, 0.4);
+}
+
+.catalog-candy-stage {
+  position: relative;
+  width: 100%;
+  max-width: 165px;
+  height: 95px;
+  min-height: 95px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(ellipse at 50% 65%, rgba(212, 175, 55, 0.16) 0%, rgba(0, 0, 0, 0.45) 75%, transparent 100%);
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+/* Escenario fotográfico del producto */
+.museum-photo-stage {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  perspective: 600px;
+}
+
+.museum-photo-ambient-glow {
+  position: absolute;
+  width: 85px;
+  height: 65px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--candy-glow, #ffd700) 0%, transparent 70%);
+  opacity: 0.35;
+  filter: blur(8px);
+  pointer-events: none;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.museum-candy-photo {
+  max-width: 120px;
+  max-height: 80px;
+  width: 110px;
+  height: 75px;
+  object-fit: contain;
+  object-position: center;
+  animation: museumCandyFloat 3.8s ease-in-out infinite;
+  filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.75));
+  transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1), filter 0.32s ease;
+  z-index: 2;
+  will-change: transform;
+  pointer-events: none;
+}
+
+.vitrine-catalog-card:hover .museum-candy-photo {
+  transform: scale(1.16) translateY(-5px);
+  filter: drop-shadow(0 12px 24px rgba(255, 215, 0, 0.55)) drop-shadow(0 4px 8px rgba(0, 0, 0, 0.8));
+  animation-play-state: paused;
+}
+
+.vitrine-catalog-card:hover .museum-photo-ambient-glow {
+  opacity: 0.65;
+  transform: scale(1.25);
+}
+
+.museum-photo-shadow {
+  position: absolute;
+  bottom: 8px;
+  width: 75px;
+  height: 12px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.6) 0%, transparent 70%);
+  animation: museumShadowPulse 3.8s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.museum-photo-shimmer-sweep {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    115deg,
+    transparent 35%,
+    rgba(255, 255, 255, 0.15) 50%,
+    transparent 65%
+  );
+  background-size: 200% 100%;
+  animation: candyShimmer 3s linear infinite;
+  pointer-events: none;
+  z-index: 3;
+}
+
+@keyframes museumCandyFloat {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-8px) rotate(1.5deg);
+  }
+}
+
+@keyframes museumShadowPulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.65;
+  }
+  50% {
+    transform: scale(0.82);
+    opacity: 0.35;
+  }
+}
+
+.catalog-year-tag {
+  position: absolute;
+  bottom: -4px;
+  background: #3b1b0a;
+  border: 1px solid #ffd700;
+  border-radius: 10px;
+  padding: 2px 8px;
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: #ffd700;
+  z-index: 4;
+}
+
+.catalog-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+}
+
+.catalog-decade {
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: #e6b749;
+  letter-spacing: 1px;
+}
+
+.catalog-title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 900;
+  color: #ffffff;
+}
+
+.catalog-importance {
+  margin: 0;
+  font-size: 0.75rem;
+  color: #edd5b8;
+  line-height: 1.3;
+}
+
+.catalog-badge {
+  margin-top: 6px;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.vitrine-catalog-card.collected .catalog-badge {
+  background: #27ae60;
+  color: #ffffff;
+}
+
+.vitrine-catalog-card.uncollected .catalog-badge {
+  background: #e67e22;
+  color: #ffffff;
+}
+
+/* --------------------------------------------------------------------------
+   10. BOTÓN CERRAR COMÚN PARA MODALES
+   -------------------------------------------------------------------------- */
+.museum-close-btn {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 36px;
+  height: 36px;
+  background: #361908;
+  border: 2px solid #d4af37;
+  border-radius: 50%;
+  color: #ffeaa7;
+  font-size: 1.1rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  z-index: 10;
+}
+
+.museum-close-btn:hover {
+  background: #c0392b;
+  border-color: #ffffff;
+  color: #ffffff;
+  transform: rotate(90deg) scale(1.08);
+}
+
+/* --------------------------------------------------------------------------
+   11. MODAL DE VITRINA INDIVIDUAL (MUSEUM SHOWCASE MODAL)
+   -------------------------------------------------------------------------- */
+.museum-showcase-dialog {
+  position: relative;
+  max-width: 860px;
+  width: 100%;
+  background: linear-gradient(160deg, #2b1407 0%, #120803 100%);
+  border: 4px solid #d4af37;
+  border-radius: 28px;
+  box-shadow: 0 25px 60px rgba(0,0,0,0.95), 0 0 35px rgba(212, 175, 55, 0.4);
+  padding: 36px 30px;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.showcase-spotlight-beam {
+  position: absolute;
+  top: -120px;
+  left: 25%;
+  width: 350px;
+  height: 450px;
+  background: radial-gradient(ellipse at center, rgba(255, 220, 100, 0.3) 0%, transparent 75%);
+  pointer-events: none;
+}
+
+.showcase-content-grid {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 32px;
+  align-items: center;
+}
+
+@media (max-width: 768px) {
+  .showcase-content-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.showcase-pedestal-column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.showcase-glass-bell {
+  position: relative;
+  width: 230px;
+  height: 240px;
+  background: radial-gradient(circle at 50% 30%, rgba(255,255,255,0.18) 0%, rgba(0,0,0,0.5) 85%);
+  border-radius: 115px 115px 16px 16px;
+  border: 3px solid rgba(255, 255, 255, 0.4);
+  box-shadow: inset 0 0 30px rgba(255,255,255,0.2), 0 15px 35px rgba(0,0,0,0.7);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.glass-reflection-streak {
+  position: absolute;
+  top: 15px;
+  left: 20px;
+  width: 18px;
+  height: 120px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.6) 0%, transparent 100%);
+  border-radius: 10px;
+  transform: rotate(-15deg);
+  pointer-events: none;
+}
+
+.candy-3d-stage {
+  width: 160px;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+/* Showcase modal candy photo */
+.showcase-candy-photo-stage {
+  position: relative;
+  width: 170px;
+  height: 125px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  perspective: 800px;
+  background: radial-gradient(ellipse at 50% 65%, rgba(212, 175, 55, 0.18) 0%, rgba(0, 0, 0, 0.45) 75%, transparent 100%);
+  border-radius: 16px;
+}
+
+.showcase-candy-photo-img {
+  max-width: 140px;
+  max-height: 100px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  animation: museumShowcaseFloat 4.2s ease-in-out infinite;
+  filter: drop-shadow(0 14px 28px rgba(0,0,0,0.85)) drop-shadow(0 0 16px var(--candy-glow, #ffd700)55);
+  z-index: 2;
+  pointer-events: none;
+  transition: transform 0.3s ease;
+}
+
+.showcase-candy-photo-stage:hover .showcase-candy-photo-img {
+  transform: scale(1.1) rotate(3deg);
+}
+
+.showcase-pedestal-cast-shadow {
+  position: absolute;
+  bottom: 2px;
+  width: 100px;
+  height: 14px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.75) 0%, transparent 75%);
+  animation: museumShadowPulse 4.2s ease-in-out infinite;
+  z-index: 1;
+}
+
+.showcase-photo-halo {
+  position: absolute;
+  width: 130px;
+  height: 95px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--candy-glow, #ffd700) 0%, transparent 70%);
+  opacity: 0.45;
+  filter: blur(12px);
+  pointer-events: none;
+}
+
+@keyframes museumShowcaseFloat {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg) scale(1);
+  }
+  50% {
+    transform: translateY(-10px) rotate(-1.5deg) scale(1.03);
+  }
+}
+
+/* CARAMELO 3D CON FORMAS */
+.vitrine-candy-3d,
+.museum-3d-candy {
+  position: relative;
+  width: 95px;
+  height: 55px;
+  border-radius: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: candySpin3D 6s infinite ease-in-out;
+}
+
+@keyframes candySpin3D {
+  0%, 100% { transform: rotateY(0deg) translateY(0); }
+  50% { transform: rotateY(180deg) translateY(-8px); }
+}
+
+.vitrine-candy-3d.shape-twist {
+  border-radius: 20px;
+}
+.vitrine-candy-3d.shape-round {
+  width: 65px;
+  height: 65px;
+  border-radius: 50%;
+}
+.vitrine-candy-3d.shape-bonobon {
+  width: 65px;
+  height: 65px;
+  border-radius: 50%;
+}
+.vitrine-candy-3d.shape-bar {
+  width: 105px;
+  height: 50px;
+  border-radius: 10px;
+}
+
+.v-knot, .candy-wrapper-knot {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  background: inherit;
+  border-radius: 50%;
+  filter: brightness(0.9);
+}
+.v-knot.knot-l, .candy-wrapper-knot.knot-left { left: -10px; }
+.v-knot.knot-r, .candy-wrapper-knot.knot-right { right: -10px; }
+
+.v-gloss, .candy-gloss-sheen {
+  position: absolute;
+  top: 5px;
+  left: 15%;
+  width: 70%;
+  height: 8px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.85), transparent);
+  border-radius: 6px;
+}
+
+.v-brand, .candy-wrapper-brand {
+  font-size: 0.72rem;
+  font-weight: 900;
+  color: #ffffff;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.85);
+  letter-spacing: 0.5px;
+  text-align: center;
+}
+
+.showcase-pedestal-base {
+  position: absolute;
+  bottom: 0;
+  width: 80%;
+  height: 24px;
+  background: linear-gradient(180deg, #693414, #361908);
+  border-radius: 12px 12px 0 0;
+  border: 2px solid #d4af37;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pedestal-plaque {
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: #ffe066;
+}
+
+.showcase-hint-rotate {
+  margin-top: 10px;
+  font-size: 0.72rem;
+  color: #cca474;
+}
+
+.showcase-info-column {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.showcase-era-tag {
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: #f1c40f;
+  letter-spacing: 1.5px;
+}
+
+.showcase-candy-title {
+  margin: 0;
+  font-size: 1.7rem;
+  font-weight: 900;
+  color: #ffffff;
+}
+
+.showcase-subtitle-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.showcase-year-pill {
+  background: #3b1b0a;
+  border: 1px solid #d4af37;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #ffd700;
+}
+
+.showcase-importance-box {
+  background: rgba(212, 175, 55, 0.12);
+  border-left: 3px solid #ffd700;
+  padding: 10px 14px;
+  border-radius: 0 8px 8px 0;
+}
+
+.importance-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.78rem;
+  color: #ffd700;
+  font-weight: 800;
+  margin-bottom: 4px;
+}
+
+.importance-text {
+  margin: 0;
+  font-size: 0.92rem;
+  line-height: 1.4;
+  color: #fff4d1;
+}
+
+.showcase-description-box p {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.45;
+  color: #edd5b8;
+}
+
+.showcase-funfact-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  background: rgba(0,0,0,0.3);
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  color: #ffda79;
+}
+
+.btn-collect-candy {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 12px;
+  background: linear-gradient(180deg, #f1c40f, #e67e22);
+  border: 2px solid #ffffff;
+  border-radius: 22px;
+  color: #2b1404;
+  font-family: inherit;
+  font-weight: 800;
+  font-size: 1.05rem;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(241, 196, 15, 0.5);
+  transition: all 0.2s ease;
+}
+
+.btn-collect-candy:hover:not(.already-collected) {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgba(241, 196, 15, 0.7);
+}
+
+.btn-collect-candy.already-collected {
+  background: #27ae60;
+  border-color: #2ecc71;
+  color: #ffffff;
+  cursor: default;
+  box-shadow: none;
+}
+
+/* --------------------------------------------------------------------------
+   12. MODAL DEL LIBRO ("NUESTRA HISTORIA")
+   -------------------------------------------------------------------------- */
+.museum-book-dialog {
+  position: relative;
+  max-width: 940px;
+  width: 100%;
+  background: #170b04;
+  border: 4px solid #d4af37;
+  border-radius: 28px;
+  padding: 26px;
+  box-shadow: 0 25px 60px rgba(0,0,0,0.95);
+  box-sizing: border-box;
+}
+
+.book-spine-crest {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 16px;
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #ffd700;
+}
+
+.open-book-spread {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  background: #fdfaf0;
+  border: 4px solid #5c3514;
+  border-radius: 12px;
+  padding: 20px;
+  color: #2b1404;
+  box-shadow: inset 0 0 25px rgba(0,0,0,0.15);
+}
+
+@media (max-width: 768px) {
+  .open-book-spread {
+    grid-template-columns: 1fr;
+  }
+}
+
+.book-page {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.photo-archive-frame {
+  position: relative;
+  border: 3px solid #8c5816;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.25);
+  background: #000;
+}
+
+.archive-photo-img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  display: block;
+}
+
+.photo-caption-text {
+  margin-top: 8px;
+  font-size: 0.78rem;
+  font-style: italic;
+  color: #5c3514;
+  text-align: center;
+}
+
+.page-seal-stamp {
+  margin-top: 10px;
+  text-align: center;
+}
+
+.seal-stamp-inner {
+  font-size: 0.65rem;
+  font-weight: 800;
+  border: 1px dashed #8c5816;
+  padding: 2px 8px;
+  border-radius: 4px;
+  color: #8c5816;
+}
+
+.chapter-year-badge {
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: #c0392b;
+}
+
+.chapter-title {
+  margin: 4px 0;
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: #2b1404;
+}
+
+.chapter-subtitle {
+  margin: 0 0 8px 0;
+  font-size: 0.85rem;
+  color: #7f4f24;
+}
+
+.chapter-body-text p {
+  margin: 0 0 6px 0;
+  font-size: 0.85rem;
+  line-height: 1.45;
+  color: #3d2314;
+}
+
+.chapter-quote-card {
+  margin-top: 10px;
+  background: #f4ecd8;
+  border-left: 3px solid #d4af37;
+  padding: 8px 12px;
+  border-radius: 0 6px 6px 0;
+}
+
+.quote-text {
+  margin: 0;
+  font-size: 0.8rem;
+  font-style: italic;
+  color: #2b1404;
+}
+
+.quote-author {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #8c5816;
+  text-align: right;
+  margin-top: 4px;
+}
+
+.page-number-footer {
+  margin-top: 10px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #8c5816;
+  text-align: center;
+}
+
+.book-navigation-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 16px;
+}
+
+.book-nav-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 16px;
+  background: #3b1b0a;
+  border: 1px solid #d4af37;
+  border-radius: 18px;
+  color: #ffeaa7;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.book-nav-btn:hover:not(:disabled) {
+  background: #592d18;
+  border-color: #ffd700;
+}
+
+.book-nav-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.book-page-indicator {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #d4af37;
+}
+
+.book-btn-archive {
+  background: linear-gradient(180deg, #6b21a8 0%, #3b0764 100%) !important;
+  border: 1.5px solid #d8b4fe !important;
+  color: #ffffff !important;
+  font-weight: 800 !important;
+  box-shadow: 0 4px 12px rgba(107, 33, 168, 0.45);
+}
+
+.book-btn-archive:hover {
+  background: linear-gradient(180deg, #7e22ce 0%, #4c1d95 100%) !important;
+  border-color: #facc15 !important;
+  box-shadow: 0 6px 18px rgba(168, 85, 247, 0.6) !important;
+  transform: translateY(-2px);
+}
+
+@media (max-width: 1200px) {
+  .badge-text {
+    display: none;
+  }
+}
+
+@media (max-width: 900px) {
+  .museum-top-bar {
+    padding: 0 10px;
+    gap: 8px;
+  }
+  .museum-btn-history-text {
+    display: none;
+  }
+  .museum-btn-history {
+    padding: 6px 10px;
+    border-radius: 50%;
+  }
+}

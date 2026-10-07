@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2a180e" />
+      <stop offset="50%" stop-color="#140a05" />
+      <stop offset="100%" stop-color="#080402" />
+    </linearGradient>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffe89e" />
+      <stop offset="40%" stop-color="#d4af37" />
+      <stop offset="70%" stop-color="#aa7c11" />
+      <stop offset="100%" stop-color="#5c4103" />
+    </linearGradient>
+    <radialGradient id="candyGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ffb74d" stop-opacity="0.9" />
+      <stop offset="60%" stop-color="#e65100" stop-opacity="0.7" />
+      <stop offset="100%" stop-color="#b71c1c" stop-opacity="0" />
+    </radialGradient>
+  </defs>
+  <!-- Background Circle with Gold Border -->
+  <rect width="512" height="512" rx="100" fill="url(#bgGrad)" />
+  <circle cx="256" cy="256" r="230" fill="none" stroke="url(#goldGrad)" stroke-width="12" stroke-dasharray="8 6" />
+  <circle cx="256" cy="256" r="215" fill="none" stroke="url(#goldGrad)" stroke-width="4" />
+  
+  <!-- Factory Chimney & Roof Silhouette in Vintage Gold -->
+  <path d="M140 340 L140 220 L210 180 L210 340 Z" fill="#aa7c11" opacity="0.6"/>
+  <path d="M210 340 L210 180 L300 230 L300 340 Z" fill="#d4af37" opacity="0.8"/>
+  <rect x="260" y="120" width="30" height="90" fill="url(#goldGrad)" rx="3"/>
+  <line x1="250" y1="120" x2="300" y2="120" stroke="#ffe89e" stroke-width="6"/>
+
+  <!-- Smoke Swirls -->
+  <path d="M275 110 C 265 90, 290 70, 280 50 C 270 35, 295 20, 285 10" fill="none" stroke="#fff3d1" stroke-width="6" stroke-linecap="round" opacity="0.5"/>
+
+  <!-- Golden Wrapped Hard Candy Motif -->
+  <circle cx="256" cy="290" r="75" fill="url(#candyGlow)" />
+  <circle cx="256" cy="290" r="50" fill="url(#goldGrad)" stroke="#fff" stroke-width="3"/>
+  
+  <!-- Candy Wrapper Wings -->
+  <path d="M195 290 L130 250 L140 290 L130 330 Z" fill="url(#goldGrad)" />
+  <path d="M317 290 L382 250 L372 290 L382 330 Z" fill="url(#goldGrad)" />
+
+  <!-- Monogram or Text: 1951 -->
+  <text x="256" y="420" font-family="'Cinzel', Georgia, serif" font-size="34" font-weight="bold" fill="url(#goldGrad)" text-anchor="middle" letter-spacing="4">ARCOR 1951</text>
+  <text x="256" y="455" font-family="sans-serif" font-size="16" font-weight="600" fill="#e0b868" text-anchor="middle" letter-spacing="6">EL DULCE IMPERIO</text>
+</svg>

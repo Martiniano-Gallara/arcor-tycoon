@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>Arcor Tycoon: El Dulce Imperio</title>
+  
+  <!-- PWA & Mobile Web App Meta Tags -->
+  <meta name="description" content="Simulador de gestión histórica e industrial del Grupo Arcor desde su primer galpón en Arroyito 1951." />
+  <meta name="theme-color" content="#1b1109" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Arcor Tycoon" />
+  <link rel="icon" type="image/svg+xml" href="./icon-192.svg" />
+  <link rel="apple-touch-icon" href="./icon-192.svg" />
+  <link rel="manifest" href="./manifest.json" />
+
+  <!-- Typography: Google Fonts (Inter, Cinzel, Playfair Display, Outfit, Nunito) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Cinzel:wght@600;700;800;900&family=Playfair+Display:ital,wght@0,600;0,700;0,900;1,600&family=Outfit:wght@400;500;600;700;800&family=Nunito:ital,wght@0,600;0,700;0,800;1,600&family=Caveat:wght@400;600;700&display=swap" rel="stylesheet" />
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="./src/assets/styles.css" />
+  <link rel="stylesheet" href="./src/assets/museum.css" />
+  <link rel="stylesheet" href="./src/assets/product_creator.css" />
+</head>
+<body>
+  <!-- Decoupled Interactive UI Layer (Retina Touch HUD & Menus) -->
+  <div id="ui-root"></div>
+
+  <!-- Application Entry Point -->
+  <script type="module" src="./src/main.ts"></script>
+</body>
+</html>

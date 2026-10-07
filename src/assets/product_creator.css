@@ -1,0 +1,1178 @@
+/* ==========================================================================
+   TALLER CREATIVO ARCOR — CREÁ TU PRODUCTO (PACKAGING 3D INTERACTIVO)
+   Diseño de fidelidad hiper-realista idéntico a la referencia del usuario:
+   - Escenario 3D de estudio chocolatoso con podio dorado y aros de luz de neón.
+   - Envoltorio Flow-Pack/Tableta horizontal con terminaciones crimp zigzag metálicas.
+   - Logo oficial oval de Arcor, tipografía Inter y sellos oficiales Arcor.
+   - Panel de configuración con tarjetas de envase, orbes glossy, inputs y botón radiante.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. CONTENEDOR PRINCIPAL FULLSCREEN DEL TALLER
+   -------------------------------------------------------------------------- */
+.creator-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  width: 100vw;
+  height: 100vh;
+  background-color: #0c0502;
+  background-image: 
+    radial-gradient(circle at 50% 15%, rgba(212, 130, 20, 0.18) 0%, transparent 65%),
+    radial-gradient(circle at 15% 45%, rgba(138, 77, 32, 0.22) 0%, transparent 50%),
+    radial-gradient(circle at 85% 75%, rgba(184, 134, 11, 0.16) 0%, transparent 55%),
+    linear-gradient(180deg, #170b04 0%, #0a0402 100%);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  user-select: none;
+  font-family: 'Outfit', 'Nunito', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  color: #fff9ed;
+  box-sizing: border-box;
+  padding: 12px 24px;
+}
+
+.creator-modal-backdrop .box-builder-canvas {
+  width: 100%;
+  height: 100%;
+  max-width: 1560px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  box-sizing: border-box;
+}
+
+/* --------------------------------------------------------------------------
+   2. BARRA SUPERIOR: VOLVER + CARTEL + STEPPER + MONEDAS
+   -------------------------------------------------------------------------- */
+.taller-top-header {
+  flex-shrink: 0;
+  width: 100%;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+/* Botón Volver */
+.taller-btn-volver {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 22px;
+  background: linear-gradient(180deg, #3d1b09 0%, #241005 100%);
+  border: 1.8px solid #d4af37;
+  border-radius: 24px;
+  color: #ffeaa7;
+  font-family: inherit;
+  font-weight: 800;
+  font-size: 0.88rem;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6), inset 0 1px 2px rgba(255, 255, 255, 0.3);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.taller-btn-volver:hover {
+  transform: translateY(-2px) scale(1.03);
+  border-color: #ffd700;
+  box-shadow: 0 6px 18px rgba(212, 175, 55, 0.5), inset 0 1px 3px #ffffff;
+  background: linear-gradient(180deg, #592e15 0%, #361908 100%);
+}
+
+.taller-btn-volver:active {
+  transform: translateY(1px);
+}
+
+/* Cartel Central */
+.taller-marquee-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  line-height: 1.15;
+}
+
+.taller-ribbon-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 18px;
+  background: rgba(26, 12, 5, 0.85);
+  border: 1.5px solid rgba(212, 175, 55, 0.8);
+  border-radius: 18px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 1.8px;
+  color: #fde68a;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6), inset 0 1px 1px rgba(255, 255, 255, 0.2);
+  margin-bottom: 2px;
+}
+
+.taller-title-3d {
+  margin: 0;
+  font-size: 1.75rem;
+  font-weight: 900;
+  letter-spacing: 1px;
+  color: #fff8eb;
+  text-transform: uppercase;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.9), 0 0 20px rgba(255, 215, 0, 0.2);
+}
+
+.taller-subtitle {
+  margin: 2px 0 0;
+  font-size: 0.82rem;
+  color: #dfcdb9;
+  font-weight: 500;
+  opacity: 0.95;
+}
+
+/* Stepper de Pasos */
+.taller-stepper-capsule {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 6px;
+  background: rgba(16, 7, 2, 0.85);
+  border: 1.5px solid rgba(212, 175, 55, 0.45);
+  border-radius: 26px;
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.6);
+}
+
+.taller-step-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 13px;
+  border-radius: 18px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #bda692;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.taller-step-item.active {
+  background: #facc15;
+  color: #1c0c03;
+  font-weight: 900;
+  box-shadow: 0 2px 10px rgba(250, 204, 21, 0.55);
+}
+
+.taller-step-item .step-circle {
+  font-weight: 900;
+}
+
+/* Monedas */
+.taller-coins-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 18px;
+  background: rgba(18, 8, 3, 0.9);
+  border: 1.8px solid #d4af37;
+  border-radius: 24px;
+  color: #ffd700;
+  font-weight: 800;
+  font-size: 1.02rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6), inset 0 1px 1px rgba(255, 255, 255, 0.2);
+}
+
+.taller-coins-pill .coin-symbol {
+  font-size: 1.25rem;
+  line-height: 1;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.6));
+}
+
+/* --------------------------------------------------------------------------
+   3. CUADRO PRINCIPAL EN 2 COLUMNAS (STAGE IZQUIERDO Y PANEL DERECHO)
+   -------------------------------------------------------------------------- */
+.taller-2col-layout {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 1.28fr 1fr;
+  gap: 20px;
+  align-items: stretch;
+}
+
+/* --------------------------------------------------------------------------
+   4. COLUMNA IZQUIERDA: PACKAGING 3D INTERACTIVO
+   -------------------------------------------------------------------------- */
+.taller-stage-card {
+  position: relative;
+  background: #140803;
+  border: 1.8px solid #d4af37;
+  border-radius: 24px;
+  box-shadow: 
+    0 12px 35px rgba(0, 0, 0, 0.85),
+    0 0 25px rgba(212, 175, 55, 0.25),
+    inset 0 1px 2px rgba(255, 230, 160, 0.3);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+/* Banner Superior del Escenario */
+.taller-stage-top-badge {
+  position: absolute;
+  top: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 22px;
+  background: rgba(16, 7, 2, 0.88);
+  border: 1.5px solid #d4af37;
+  border-radius: 20px;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  color: #fde68a;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6);
+  white-space: nowrap;
+}
+
+/* Fondo Escénico del Estudio (Podio de Oro, Aros de Neón, Chocolate 3D) */
+.taller-stage-viewport {
+  position: absolute;
+  inset: 0;
+  background-image: url('/taller_podium_stage.jpg');
+  background-size: cover;
+  background-position: center 60%;
+  filter: brightness(1.05) contrast(1.08);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Flechas de navegación del carrusel (< y >) */
+.stage-carousel-nav-btn {
+  position: absolute;
+  top: 48%;
+  transform: translateY(-50%);
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: rgba(22, 10, 4, 0.88);
+  border: 2px solid #d4af37;
+  color: #ffd700;
+  font-size: 1.4rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 15;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.75), inset 0 1px 2px rgba(255, 255, 255, 0.3);
+  transition: all 0.15s ease;
+}
+
+.stage-carousel-nav-btn:hover {
+  transform: translateY(-50%) scale(1.1);
+  border-color: #ffffff;
+  color: #ffffff;
+  background: rgba(45, 20, 8, 0.95);
+  box-shadow: 0 8px 22px rgba(212, 175, 55, 0.6);
+}
+
+.stage-carousel-nav-btn:active {
+  transform: translateY(-50%) scale(0.95);
+}
+
+.stage-carousel-nav-btn.prev-btn {
+  left: 20px;
+}
+
+.stage-carousel-nav-btn.next-btn {
+  right: 20px;
+}
+
+/* Escenario 3D Central con el Producto Flotante */
+.taller-product-3d-anchor {
+  position: relative;
+  z-index: 8;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  perspective: 1200px;
+  padding-top: 50px;
+  padding-bottom: 20px;
+}
+
+/* --------------------------------------------------------------------------
+   5. ENVOLTORIO 3D ULTRA-REALISTA (FLOW-PACK / TABLETA CHOCOLATE)
+   -------------------------------------------------------------------------- */
+.taller-wrapper-hero {
+  position: relative;
+  width: 470px;
+  height: 250px;
+  border-radius: 12px;
+  box-shadow: 
+    0 32px 85px rgba(0, 0, 0, 0.96),
+    0 0 55px rgba(219, 39, 119, 0.45),
+    inset 0 1px 3px rgba(255, 255, 255, 0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease;
+  cursor: grab;
+  user-select: none;
+  transform: perspective(1000px) rotateZ(-7deg) rotateY(12deg) rotateX(-5deg);
+  animation: wrapperGentleFloat 4.6s infinite ease-in-out alternate;
+}
+
+.taller-wrapper-hero:active {
+  cursor: grabbing;
+}
+
+.taller-wrapper-hero:hover {
+  box-shadow: 0 35px 95px rgba(0, 0, 0, 0.98), 0 0 65px rgba(255, 215, 0, 0.5);
+}
+
+@keyframes wrapperGentleFloat {
+  0% { transform: perspective(1000px) rotateZ(-7deg) rotateY(12deg) rotateX(-5deg) translateY(0px); }
+  50% { transform: perspective(1000px) rotateZ(-6deg) rotateY(14deg) rotateX(-4deg) translateY(-8px); }
+  100% { transform: perspective(1000px) rotateZ(-7.5deg) rotateY(10deg) rotateX(-6deg) translateY(2px); }
+}
+
+/* Contenedor Interior del Envoltorio */
+.wrapper-inner-body {
+  position: absolute;
+  inset: 0;
+  border-radius: 10px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(ellipse at 50% 30%, #ec4899 0%, #db2777 35%, #9d174d 75%, #4c0519 100%);
+}
+
+/* Bordes Crimp Metálicos Dentados en Zig-Zag (Izquierda y Derecha) */
+.wrapper-crimp-seal {
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  width: 26px;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(255, 195, 230, 0.98) 0px,
+    rgba(255, 195, 230, 0.98) 3px,
+    rgba(175, 18, 90, 0.98) 3px,
+    rgba(175, 18, 90, 0.98) 6px
+  );
+  z-index: 10;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.7);
+}
+
+.wrapper-crimp-left {
+  left: -16px;
+  clip-path: polygon(
+    100% 0%, 0% 0%, 100% 4%, 0% 8%, 100% 12%, 0% 16%, 100% 20%, 0% 24%, 100% 28%, 0% 32%,
+    100% 36%, 0% 40%, 100% 44%, 0% 48%, 100% 52%, 0% 56%, 100% 60%, 0% 64%, 100% 68%, 0% 72%,
+    100% 76%, 0% 80%, 100% 84%, 0% 88%, 100% 92%, 0% 96%, 100% 100%
+  );
+  border-right: 1.5px solid rgba(0, 0, 0, 0.5);
+}
+
+.wrapper-crimp-right {
+  right: -16px;
+  clip-path: polygon(
+    0% 0%, 100% 0%, 0% 4%, 100% 8%, 0% 12%, 100% 16%, 0% 20%, 100% 24%, 0% 28%, 100% 32%,
+    0% 36%, 100% 40%, 0% 44%, 100% 48%, 0% 52%, 100% 56%, 0% 60%, 100% 64%, 0% 68%, 100% 72%,
+    0% 76%, 100% 80%, 0% 84%, 100% 88%, 0% 92%, 100% 96%, 0% 100%
+  );
+  border-left: 1.5px solid rgba(0, 0, 0, 0.5);
+}
+
+/* Capas de Ilustración y Reflejos Metálicos */
+.wrapper-sheen-highlight {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0.12) 35%, transparent 60%);
+  pointer-events: none;
+  z-index: 4;
+}
+
+.wrapper-metallic-sweep {
+  position: absolute;
+  top: -80%;
+  left: -80%;
+  width: 260%;
+  height: 260%;
+  background: linear-gradient(
+    45deg,
+    transparent 42%,
+    rgba(255, 255, 255, 0.35) 48%,
+    rgba(255, 215, 0, 0.45) 52%,
+    transparent 58%
+  );
+  transform: rotate(25deg);
+  animation: metallicFoilSweep 4s infinite linear;
+  pointer-events: none;
+  z-index: 5;
+}
+
+@keyframes metallicFoilSweep {
+  0% { transform: translateY(-100%) rotate(25deg); }
+  100% { transform: translateY(100%) rotate(25deg); }
+}
+
+/* Ilustración de Olas de Chocolate en el Envoltorio */
+.wrapper-choco-ribbon-bg {
+  position: absolute;
+  inset: 0;
+  background-image: 
+    radial-gradient(ellipse at 88% 28%, rgba(55, 20, 6, 0.75) 0%, transparent 60%),
+    radial-gradient(ellipse at 12% 82%, rgba(55, 20, 6, 0.85) 0%, transparent 65%),
+    linear-gradient(135deg, transparent 38%, rgba(68, 25, 7, 0.85) 50%, rgba(255, 240, 225, 0.5) 54%, rgba(50, 18, 5, 0.9) 60%, transparent 75%);
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* Cubos de Chocolate Ilustrados en el Packaging */
+.wrapper-choco-cube-decor {
+  position: absolute;
+  pointer-events: none;
+  z-index: 3;
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, #6b3e1c 0%, #401f09 50%, #210d03 100%);
+  border: 1.5px solid rgba(255, 215, 0, 0.4);
+  border-radius: 8px;
+  box-shadow: 
+    0 10px 22px rgba(0, 0, 0, 0.85),
+    inset 2px 2px 4px rgba(255, 255, 255, 0.5),
+    inset -2px -2px 4px rgba(0, 0, 0, 0.7);
+}
+
+.wrapper-choco-cube-decor.cube-left {
+  left: 44px;
+  bottom: 26px;
+  transform: rotate(-18deg);
+}
+
+.wrapper-choco-cube-decor.cube-right {
+  right: 44px;
+  top: 28px;
+  transform: rotate(22deg);
+}
+
+/* Contenido Frontal del Envoltorio */
+.wrapper-front-content {
+  position: relative;
+  z-index: 5;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 44px;
+  box-sizing: border-box;
+  text-align: center;
+}
+
+/* Óvalo Oficial Arcor */
+.pkg-arcor-oval-emblem {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 14px;
+  background: #004b9b;
+  border: 2px solid #ffd700;
+  border-radius: 22px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6), inset 0 1px 2px rgba(255, 255, 255, 0.5);
+  margin-bottom: 2px;
+}
+
+.pkg-arcor-logo-img {
+  height: 28px;
+  width: auto;
+  object-fit: contain;
+  display: block;
+}
+
+.pkg-slogan-line {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: #fff9ea;
+  letter-spacing: 0.2px;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
+  margin-top: 1px;
+}
+
+/* Nombre Personalizado */
+.pkg-hero-title {
+  margin: 3px 0 1px;
+  font-family: 'Inter', sans-serif;
+  font-size: 1.35rem;
+  font-weight: 900;
+  color: #ffffff;
+  letter-spacing: 0.3px;
+  line-height: 1.15;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.95);
+}
+
+/* Sabor / Dedicatoria */
+.pkg-hero-flavor {
+  margin: 0;
+  font-size: 0.85rem;
+  font-style: italic;
+  font-weight: 500;
+  color: #fff2d6;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
+  line-height: 1.2;
+}
+
+/* Sellos Oficiales Colocados en el Envoltorio (Apilados en el Centro) */
+.pkg-wrapper-badges-row {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3.5px;
+  margin-top: 4px;
+}
+
+.pkg-hero-badge-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 2px 16px;
+  min-width: 145px;
+  background: rgba(18, 7, 3, 0.82);
+  border: 1.4px solid #ffd700;
+  border-radius: 14px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: #ffffff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.75);
+}
+
+.pkg-hero-badge-pill .b-icon {
+  font-size: 0.82rem;
+}
+
+/* --------------------------------------------------------------------------
+   6. CONTROLES INFERIORES DEL ESCENARIO 3D
+   -------------------------------------------------------------------------- */
+.taller-stage-bottom-bar {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Puntos de Paginación (4 dots) */
+.taller-dots-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.taller-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  border: 1.5px solid #d4af37;
+  background: transparent;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.taller-dot.active {
+  background: #facc15;
+  border-color: #facc15;
+  box-shadow: 0 0 10px #facc15;
+}
+
+/* Botones de Ángulo / Órbita */
+.taller-orbit-btns-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.taller-orbit-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 14px;
+  background: rgba(18, 8, 3, 0.85);
+  border: 1.5px solid #d4af37;
+  border-radius: 16px;
+  color: #fff4d1;
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.5);
+}
+
+.taller-orbit-btn:hover {
+  background: #3e1f0b;
+  border-color: #ffd700;
+  color: #ffffff;
+  transform: translateY(-2px);
+}
+
+/* Pill del Formato Actual */
+.taller-current-format-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 18px;
+  background: rgba(22, 10, 4, 0.9);
+  border: 1.5px solid #d4af37;
+  border-radius: 20px;
+  color: #fde68a;
+  font-size: 0.82rem;
+  font-weight: 800;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.6);
+  cursor: pointer;
+}
+
+/* --------------------------------------------------------------------------
+   7. COLUMNA DERECHA: PANEL DE CONFIGURACIÓN DEL PRODUCTO
+   -------------------------------------------------------------------------- */
+.taller-controls-card {
+  position: relative;
+  background: #140803;
+  border: 1.8px solid #d4af37;
+  border-radius: 24px;
+  box-shadow: 
+    0 12px 35px rgba(0, 0, 0, 0.85),
+    0 0 25px rgba(212, 175, 55, 0.25),
+    inset 0 1px 2px rgba(255, 230, 160, 0.3);
+  padding: 18px 20px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow-y: auto;
+  gap: 14px;
+}
+
+/* Secciones de Selección */
+.taller-panel-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.taller-sec-header {
+  font-size: 0.88rem;
+  font-weight: 800;
+  color: #ffd700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+/* Tarjetas de Envase (Fila de 3) */
+.taller-packaging-cards-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.taller-pkg-card {
+  position: relative;
+  background: rgba(20, 9, 3, 0.75);
+  border: 1.5px solid rgba(212, 175, 55, 0.35);
+  border-radius: 12px;
+  padding: 10px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+}
+
+.taller-pkg-card:hover:not(.locked) {
+  border-color: #ffd700;
+  background: rgba(38, 18, 7, 0.9);
+  transform: translateY(-2px);
+}
+
+.taller-pkg-card.selected {
+  background: linear-gradient(180deg, #381907 0%, #1f0c03 100%);
+  border: 2px solid #ffd700;
+  box-shadow: 0 0 16px rgba(255, 215, 0, 0.45), inset 0 1px 2px rgba(255, 255, 255, 0.25);
+}
+
+.taller-pkg-card.locked {
+  opacity: 0.82;
+  border-color: rgba(212, 175, 55, 0.2);
+}
+
+.taller-pkg-card .card-top-icon {
+  font-size: 1.25rem;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.taller-pkg-card .card-lock-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: #38bdf8;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  margin-bottom: 2px;
+}
+
+.taller-pkg-card .card-title {
+  font-size: 0.75rem;
+  font-weight: 900;
+  color: #fff8eb;
+  line-height: 1.15;
+  text-transform: uppercase;
+  margin-bottom: 3px;
+}
+
+.taller-pkg-card.selected .card-title {
+  color: #ffd700;
+}
+
+.taller-pkg-card .card-desc {
+  font-size: 0.65rem;
+  color: #c4b5a5;
+  line-height: 1.25;
+}
+
+/* Selector de Color (6 Orbes Glossy) */
+.taller-colors-swatches-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.taller-color-orb {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  position: relative;
+  box-shadow: 
+    0 6px 14px rgba(0, 0, 0, 0.7),
+    inset 0 3px 5px rgba(255, 255, 255, 0.6),
+    inset 0 -3px 6px rgba(0, 0, 0, 0.5);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.taller-color-orb:hover {
+  transform: scale(1.1);
+}
+
+.taller-color-orb.selected {
+  box-shadow: 
+    0 0 0 3px #ffffff,
+    0 0 0 5px #ffd700,
+    0 8px 20px rgba(0, 0, 0, 0.9),
+    inset 0 3px 5px rgba(255, 255, 255, 0.7);
+  transform: scale(1.08);
+}
+
+.taller-color-orb.locked {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.taller-color-orb.locked .orb-lock {
+  font-size: 1rem;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.8));
+}
+
+/* Inputs de Nombre y Sabor */
+.taller-inputs-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.taller-input-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.taller-input-label {
+  width: 65px;
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: #ffd700;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.taller-text-input {
+  flex: 1;
+  background: rgba(18, 8, 3, 0.9);
+  border: 1.5px solid rgba(212, 175, 55, 0.45);
+  border-radius: 20px;
+  padding: 8px 16px;
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  outline: none;
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.6);
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.taller-text-input:focus {
+  border-color: #ffd700;
+  box-shadow: 0 0 12px rgba(255, 215, 0, 0.35), inset 0 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+/* Sellos Oficiales Arcor (Pills con Colores Vivos - 2 Columnas) */
+.taller-badges-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.taller-badge-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 18px;
+  font-family: inherit;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  border: 1.5px solid transparent;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.5);
+  transition: all 0.15s ease;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.taller-badge-chip:hover:not(.locked) {
+  transform: translateY(-2px);
+  filter: brightness(1.15);
+}
+
+/* Variaciones de Color de los Sellos según Referencia */
+.taller-badge-chip.badge-green {
+  background: linear-gradient(180deg, #15803d 0%, #0f5127 100%);
+  color: #f0fdf4;
+  border-color: #4ade80;
+}
+
+.taller-badge-chip.badge-magenta {
+  background: linear-gradient(180deg, #be185d 0%, #831843 100%);
+  color: #fdf2f8;
+  border-color: #f472b6;
+}
+
+.taller-badge-chip.badge-brown {
+  background: linear-gradient(180deg, #5a2e12 0%, #361706 100%);
+  color: #fef3c7;
+  border-color: #d97706;
+}
+
+.taller-badge-chip.badge-locked {
+  background: rgba(22, 10, 4, 0.6);
+  color: #9c8a77;
+  border-color: rgba(212, 175, 55, 0.25);
+  cursor: not-allowed;
+}
+
+.taller-badge-chip.selected {
+  box-shadow: 0 0 12px rgba(255, 215, 0, 0.5), inset 0 1px 2px rgba(255, 255, 255, 0.4);
+  border-color: #ffd700;
+  font-weight: 800;
+}
+
+/* Botón Grande Radiante de Finalizar Diseño */
+.btn-taller-finalizar {
+  width: 100%;
+  padding: 13px 20px;
+  background: linear-gradient(90deg, #f97316 0%, #ea580c 50%, #f59e0b 100%);
+  border: 2px solid #fdba74;
+  border-radius: 28px;
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 1.15rem;
+  font-weight: 900;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  cursor: pointer;
+  box-shadow: 
+    0 8px 25px rgba(249, 115, 22, 0.65),
+    inset 0 2px 2px rgba(255, 255, 255, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: all 0.2s ease;
+  margin-top: 4px;
+}
+
+.btn-taller-finalizar:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 
+    0 12px 32px rgba(249, 115, 22, 0.8),
+    0 0 20px rgba(251, 146, 60, 0.5),
+    inset 0 2px 3px #ffffff;
+  border-color: #ffffff;
+}
+
+.btn-taller-finalizar:active {
+  transform: translateY(1px);
+}
+
+/* --------------------------------------------------------------------------
+   8. RESPONSIVE MEDIA QUERIES PARA CELULARES Y TABLETS
+   -------------------------------------------------------------------------- */
+@media (max-width: 1100px) {
+  .taller-2col-layout {
+    grid-template-columns: 1fr;
+    overflow-y: auto;
+  }
+  .taller-stage-card {
+    min-height: 440px;
+  }
+  .taller-wrapper-hero {
+    width: 360px;
+    height: 195px;
+  }
+}
+
+@media (max-width: 768px) {
+  .creator-modal-backdrop {
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
+    height: auto !important;
+    min-height: 100dvh;
+    padding: 8px 8px 36px;
+    box-sizing: border-box;
+  }
+
+  .creator-modal-backdrop .box-builder-canvas {
+    height: auto !important;
+    min-height: 0;
+    overflow: visible;
+  }
+
+  .taller-top-header {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    grid-template-areas:
+      "back title coins"
+      "stepper stepper stepper";
+    align-items: center;
+    gap: 8px;
+    height: auto;
+    margin-bottom: 10px;
+    width: 100%;
+  }
+
+  .taller-btn-volver {
+    grid-area: back;
+    padding: 6px 14px;
+    font-size: 0.80rem;
+    border-radius: 999px;
+  }
+
+  .taller-marquee-center {
+    grid-area: title;
+    width: 100%;
+    line-height: 1.1;
+  }
+
+  .taller-ribbon-badge {
+    font-size: 0.58rem;
+    padding: 2px 10px;
+    letter-spacing: 1px;
+    margin-bottom: 1px;
+  }
+
+  .taller-title-3d {
+    font-size: 1.15rem;
+    line-height: 1.1;
+  }
+
+  .taller-subtitle {
+    display: none;
+  }
+
+  .taller-coins-pill {
+    grid-area: coins;
+    padding: 5px 12px;
+    font-size: 0.82rem;
+    border-radius: 999px;
+  }
+
+  .taller-stepper-capsule {
+    grid-area: stepper;
+    width: 100%;
+    justify-content: space-between;
+    overflow-x: auto;
+    scrollbar-width: none;
+    padding: 3px 6px;
+    box-sizing: border-box;
+  }
+  .taller-stepper-capsule::-webkit-scrollbar {
+    display: none;
+  }
+
+  .taller-step-item {
+    padding: 4px 6px;
+    font-size: 0.68rem;
+    white-space: nowrap;
+    flex: 1 1 auto;
+    justify-content: center;
+    gap: 3px;
+  }
+
+  .taller-2col-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    width: 100%;
+    overflow: visible;
+  }
+
+  .taller-stage-card {
+    min-height: auto;
+    height: auto;
+    padding: 10px 8px 14px;
+    border-radius: 18px;
+    overflow: hidden;
+  }
+
+  .taller-stage-viewport {
+    border-radius: 14px;
+  }
+
+  .taller-product-3d-anchor {
+    min-height: 200px;
+    height: 200px;
+    margin: 6px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .taller-wrapper-hero {
+    max-width: 290px !important;
+    width: 86% !important;
+    height: 160px !important;
+    transform: perspective(1000px) rotateZ(-5deg) rotateY(8deg) scale(0.95);
+  }
+
+  .wrapper-inner-body {
+    position: absolute !important;
+    inset: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: 100% !important;
+  }
+
+  .pkg-hero-title {
+    font-size: 1.05rem !important;
+    line-height: 1.15 !important;
+  }
+
+  .pkg-hero-flavor {
+    font-size: 0.68rem !important;
+  }
+
+  .pkg-arcor-logo-img {
+    height: 22px !important;
+  }
+
+  .wrapper-crimp-seal {
+    width: 18px !important;
+  }
+
+  .wrapper-crimp-left {
+    left: -10px !important;
+  }
+
+  .wrapper-crimp-right {
+    right: -10px !important;
+  }
+
+  .taller-stage-bottom-bar {
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .taller-orbit-btn {
+    padding: 4px 10px;
+    font-size: 0.74rem;
+  }
+
+  .taller-current-format-pill {
+    padding: 4px 12px;
+    font-size: 0.74rem;
+  }
+
+  .taller-controls-card {
+    padding: 14px 12px;
+    border-radius: 18px;
+    width: 100%;
+    box-sizing: border-box;
+    max-height: none;
+    overflow: visible;
+  }
+
+  .taller-packaging-cards-row {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+  }
+
+  .taller-pkg-card {
+    padding: 6px 4px;
+    border-radius: 12px;
+  }
+
+  .taller-colors-swatches-row {
+    gap: 8px;
+    justify-content: space-around;
+  }
+
+  .taller-color-orb {
+    width: 38px;
+    height: 38px;
+  }
+
+  .taller-badges-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px;
+  }
+
+  .btn-taller-finalizar {
+    width: 100%;
+    padding: 12px 24px;
+    font-size: 1.05rem;
+    border-radius: 999px;
+  }
+}
