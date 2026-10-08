@@ -57,7 +57,7 @@ export const SAGA_ZONES: SagaZoneInfo[] = [
       year: 1951,
       title: '1951: Fundación de Arcor',
       subtitle: 'Nace el sueño en un modesto taller de Arroyito',
-      cardId: 'card-fundacion-1951'
+      cardId: 'event-1951-fundacion'
     },
     sceneryElements: [
       { id: 'chimenea-arroyito', type: 'brick-chimney', xPercent: 26, yPercent: 32, title: 'Chimenea Histórica de Arroyito', icon: '🏭' },
@@ -72,7 +72,7 @@ export const SAGA_ZONES: SagaZoneInfo[] = [
     startLevel: 9,
     endLevel: 16,
     startYear: 1959,
-    endYear: 1968,
+    endYear: 1966,
     themeTitle: 'Cañaverales, Azúcar & Glucosa Propia',
     themeSubtitle: 'Tucumán y Lules · Autoabastecimiento',
     description: 'Arcor cultiva su propia caña de azúcar y monta su primera planta de molienda y glucosa para garantizar materias primas puras.',
@@ -84,7 +84,7 @@ export const SAGA_ZONES: SagaZoneInfo[] = [
       year: 1960,
       title: '1960: Primera Fábrica de Glucosa',
       subtitle: 'Independencia productiva e integración agroindustrial',
-      cardId: 'card-primer-galpon'
+      cardId: 'event-1958-integracion-vertical'
     },
     sceneryElements: [
       { id: 'canaveral-tucuman', type: 'sugarcane-field', xPercent: 16, yPercent: 20, title: 'Cañaveral de Azúcar Lules', icon: '🌾' },
@@ -100,8 +100,8 @@ export const SAGA_ZONES: SagaZoneInfo[] = [
     eraName: 'La Era del Chocolate',
     startLevel: 17,
     endLevel: 25,
-    startYear: 1969,
-    endYear: 1978,
+    startYear: 1967,
+    endYear: 1975,
     themeTitle: 'Nacimiento de Chocolates & Colonia Caroya',
     themeSubtitle: 'Córdoba · Puro Chocolate con Leche',
     description: 'Apertura de la emblemática planta de chocolates en Colonia Caroya: nacen las tabletas Cofler, turrones y las primeras coberturas finas.',
@@ -109,11 +109,11 @@ export const SAGA_ZONES: SagaZoneInfo[] = [
     bgGradient: 'linear-gradient(180deg, #273010 0%, #30180d 35%, #421c0b 70%, #33150d 100%)',
     bgImage: './saga_zone3_bg.jpg',
     milestone: {
-      level: 18,
+      level: 20,
       year: 1970,
       title: '1970: Planta Colonia Caroya',
       subtitle: 'Comienza la gran historia del chocolate Arcor',
-      cardId: 'card-planta-caroya'
+      cardId: 'event-1970-feria-ism-colonia'
     },
     sceneryElements: [
       { id: 'planta-caroya-facade', type: 'caroya-castle', xPercent: 80, yPercent: 16, title: 'Planta Colonia Caroya', icon: '🍫' },
@@ -129,8 +129,8 @@ export const SAGA_ZONES: SagaZoneInfo[] = [
     eraName: 'El Fenómeno Bon o Bon',
     startLevel: 26,
     endLevel: 34,
-    startYear: 1979,
-    endYear: 1988,
+    startYear: 1976,
+    endYear: 1984,
     themeTitle: 'Bon o Bon & Semana de la Dulzura',
     themeSubtitle: '1984 · Un bombón al alcance de todos',
     description: 'En 1984 nace Bon o Bon: oblea crocante, pasta de maní y chocolate. En 1989 nace la tradicional Semana de la Dulzura ("Un Bon o Bon por un beso").',
@@ -138,11 +138,11 @@ export const SAGA_ZONES: SagaZoneInfo[] = [
     bgGradient: 'linear-gradient(180deg, #33150d 0%, #4c1122 35%, #59162c 70%, #3b0f22 100%)',
     bgImage: './saga_zone4_bg.jpg',
     milestone: {
-      level: 28,
-      year: 1980,
-      title: '1980: El Nacimiento de Bon o Bon',
+      level: 34,
+      year: 1984,
+      title: '1984: El Nacimiento de Bon o Bon',
       subtitle: 'Un hito que conquistó a la Argentina y al mundo',
-      cardId: 'card-bonobon-1984'
+      cardId: 'event-1984-bonobon'
     },
     sceneryElements: [
       { id: 'bonobon-pedestal', type: 'giant-bonobon', xPercent: 16, yPercent: 22, title: 'Monumento al Bon o Bon', icon: '✨' },
@@ -158,8 +158,8 @@ export const SAGA_ZONES: SagaZoneInfo[] = [
     eraName: 'Universo Galletitas & Golosinas',
     startLevel: 35,
     endLevel: 43,
-    startYear: 1989,
-    endYear: 1998,
+    startYear: 1985,
+    endYear: 1993,
     themeTitle: 'Bagley, Galletitas Doradas, Mogul & Rocklets',
     themeSubtitle: 'Alianza Histórica y Explosión de Color',
     description: 'Arcor se asocia con Danone para potenciar Bagley (Criollitas, Opera, Rumba, Chocolinas) e introduce las famosas gomitas Mogul y confites Rocklets.',
@@ -167,11 +167,11 @@ export const SAGA_ZONES: SagaZoneInfo[] = [
     bgGradient: 'linear-gradient(180deg, #3b0f22 0%, #281442 35%, #1e1550 70%, #171c4c 100%)',
     bgImage: './saga_zone5_bg.jpg',
     milestone: {
-      level: 37,
-      year: 1990,
-      title: '1990: Alianza Bagley, Mogul & Rocklets',
+      level: 39,
+      year: 1989,
+      title: '1989: Semana de la Dulzura & Golosinas',
       subtitle: 'Líderes indiscutidos en galletitas y golosinas coloridas',
-      cardId: 'card-alianza-bagley-2004'
+      cardId: 'event-1989-semana-dulzura'
     },
     sceneryElements: [
       { id: 'castillo-bagley', type: 'bagley-clocktower', xPercent: 82, yPercent: 18, title: 'Molinos y Planta Bagley', icon: '🍪' },
@@ -187,8 +187,8 @@ export const SAGA_ZONES: SagaZoneInfo[] = [
     eraName: 'Alimentos & La Campagnola',
     startLevel: 44,
     endLevel: 52,
-    startYear: 1999,
-    endYear: 2008,
+    startYear: 1994,
+    endYear: 2002,
     themeTitle: 'Tomates, Mermeladas, Conservas & Lácteos',
     themeSubtitle: 'Mendoza & San Jerónimo · La Mesa Familiar',
     description: 'Incorporación de La Campagnola, liderazgo en conservas de tomates, mermeladas puras, tambos lecheros y alimentos nutritivos para todos.',
@@ -196,11 +196,11 @@ export const SAGA_ZONES: SagaZoneInfo[] = [
     bgGradient: 'linear-gradient(180deg, #171c4c 0%, #331f12 35%, #46260f 70%, #2b1f13 100%)',
     bgImage: './saga_zone6_bg.jpg',
     milestone: {
-      level: 46,
-      year: 2000,
-      title: '2000: La Campagnola & Alimentos',
+      level: 49,
+      year: 1999,
+      title: '1999: Expansión Internacional & Alimentos',
       subtitle: 'La dulzura y nutrición llegan a cada comida familiar',
-      cardId: 'card-alianza-bagley-2004'
+      cardId: 'event-1999-braganca-internacional'
     },
     sceneryElements: [
       { id: 'huerta-tomates', type: 'campagnola-orchard', xPercent: 18, yPercent: 20, title: 'Huertas de Tomate Mendocino', icon: '🍅' },
@@ -216,8 +216,8 @@ export const SAGA_ZONES: SagaZoneInfo[] = [
     eraName: 'Helados & Biotecnología',
     startLevel: 53,
     endLevel: 60,
-    startYear: 2009,
-    endYear: 2018,
+    startYear: 2003,
+    endYear: 2010,
     themeTitle: 'Heladería, Enzimas & Alimentos Saludables',
     themeSubtitle: 'Nutrición Equilibrada & Sin TACC',
     description: 'Lanzamiento de los Helados Arcor, producción de enzimas naturales en Arroyito y un fuerte compromiso con alimentos libres de gluten (Sin TACC).',
@@ -225,11 +225,11 @@ export const SAGA_ZONES: SagaZoneInfo[] = [
     bgGradient: 'linear-gradient(180deg, #2b1f13 0%, #0d2f36 35%, #0b3d39 70%, #092c2e 100%)',
     bgImage: './saga_zone7_bg.jpg',
     milestone: {
-      level: 55,
-      year: 2010,
-      title: '2010: Helados & Innovación Saludable',
+      level: 59,
+      year: 2009,
+      title: '2009: Momentos Mágicos & Helados',
       subtitle: 'Lanzamiento de Helados y liderazgo en alimentos Sin TACC',
-      cardId: 'card-sostenibilidad-2020'
+      cardId: 'event-2009-arcorito-momentos-magicos'
     },
     sceneryElements: [
       { id: 'glaciar-helados', type: 'ice-cream-peak', xPercent: 82, yPercent: 20, title: 'Monte de Helados Bon o Bon & Cofler', icon: '🍦' },
@@ -245,8 +245,8 @@ export const SAGA_ZONES: SagaZoneInfo[] = [
     eraName: 'Sustentabilidad & Mundo',
     startLevel: 61,
     endLevel: 70,
-    startYear: 2019,
-    endYear: 2024,
+    startYear: 2011,
+    endYear: 2020,
     themeTitle: 'Energía Renovable, Cuidado Personal & Globalización',
     themeSubtitle: 'Más de 120 países · Compromiso Verde',
     description: 'Parques eólicos y biomasa abastecen las fábricas; empaques 100% reciclables; exportaciones récord a los 5 continentes.',
@@ -254,11 +254,11 @@ export const SAGA_ZONES: SagaZoneInfo[] = [
     bgGradient: 'linear-gradient(180deg, #092c2e 0%, #08283d 35%, #092338 70%, #101c2e 100%)',
     bgImage: './saga_zone8_bg.jpg',
     milestone: {
-      level: 63,
-      year: 2020,
-      title: '2020: Compromiso 100% Renovable',
+      level: 65,
+      year: 2015,
+      title: '2015: Alianzas Globales y Sustentabilidad',
       subtitle: 'Energía limpia, empaques sustentables y presencia global',
-      cardId: 'card-sostenibilidad-2020'
+      cardId: 'event-2015-coca-cola-alianza'
     },
     sceneryElements: [
       { id: 'parque-eolico', type: 'wind-turbines', xPercent: 18, yPercent: 18, title: 'Parque de Energía Eólica Limpia', icon: '🌬️' },
@@ -274,7 +274,7 @@ export const SAGA_ZONES: SagaZoneInfo[] = [
     eraName: 'El Legado Eterno (1951 — 2026)',
     startLevel: 71,
     endLevel: 75,
-    startYear: 2025,
+    startYear: 2021,
     endYear: 2026,
     themeTitle: '75 Años de Arcor: Haciendo un Mundo más Dulce',
     themeSubtitle: 'Podio Dorado de Honor · ¡Cumbre de la Saga!',
@@ -287,7 +287,7 @@ export const SAGA_ZONES: SagaZoneInfo[] = [
       year: 2026,
       title: '75 AÑOS DE HISTORIA ARCOR',
       subtitle: '¡Gracias por compartir 75 años de magia y dulzura!',
-      cardId: 'card-arcor-hoy'
+      cardId: 'event-2026-arcor-75-aniversario'
     },
     sceneryElements: [
       { id: 'gran-trofeo-75', type: 'golden-trophy-stage', xPercent: 50, yPercent: 28, title: 'Trofeo Dorado de los 75 Años', icon: '🏆' },
@@ -317,7 +317,7 @@ export const SAGA_HISTORICAL_MILESTONES: SagaMilestoneInfo[] = [
     title: 'Fundación & Primera Paila',
     subtitle: 'Nace Arcor en Arroyito, Córdoba',
     icon: '🔥',
-    cardId: 'card-fundacion-1951'
+    cardId: 'event-1951-fundacion'
   },
   {
     level: 3,
@@ -325,7 +325,7 @@ export const SAGA_HISTORICAL_MILESTONES: SagaMilestoneInfo[] = [
     title: 'Primer Camión Ford Verde',
     subtitle: 'Distribución directa y sin intermediarios',
     icon: '🚚',
-    cardId: 'card-distribucion-1953'
+    cardId: 'event-1953-capacidad-inicial'
   },
   {
     level: 8,
@@ -333,7 +333,7 @@ export const SAGA_HISTORICAL_MILESTONES: SagaMilestoneInfo[] = [
     title: 'Primera Molienda de Maíz',
     subtitle: 'Integración vertical y glucosa pura',
     icon: '🌽',
-    cardId: 'card-molienda-1958'
+    cardId: 'event-1958-integracion-vertical'
   },
   {
     level: 10,
@@ -341,7 +341,7 @@ export const SAGA_HISTORICAL_MILESTONES: SagaMilestoneInfo[] = [
     title: 'Fábrica de Glucosa Lules',
     subtitle: 'Autoabastecimiento en Tucumán',
     icon: '🏭',
-    cardId: 'card-primer-galpon'
+    cardId: 'event-1958-integracion-vertical'
   },
   {
     level: 14,
@@ -349,7 +349,7 @@ export const SAGA_HISTORICAL_MILESTONES: SagaMilestoneInfo[] = [
     title: 'Primeras Exportaciones',
     subtitle: 'Salto al comercio exterior',
     icon: '🌐',
-    cardId: 'card-export-1964'
+    cardId: 'event-1964-exportacion-europa'
   },
   {
     level: 18,
@@ -357,7 +357,7 @@ export const SAGA_HISTORICAL_MILESTONES: SagaMilestoneInfo[] = [
     title: 'Llegada a Mercado de EE.UU.',
     subtitle: 'Consolidación internacional',
     icon: '🗽',
-    cardId: 'card-usa-1968'
+    cardId: 'event-1968-incidente-ecuador'
   },
   {
     level: 20,
@@ -365,7 +365,7 @@ export const SAGA_HISTORICAL_MILESTONES: SagaMilestoneInfo[] = [
     title: 'Planta Colonia Caroya',
     subtitle: 'Nacen los chocolates Arcor y Cofler',
     icon: '🍫',
-    cardId: 'card-planta-caroya'
+    cardId: 'event-1970-feria-ism-colonia'
   },
   {
     level: 24,
@@ -373,7 +373,7 @@ export const SAGA_HISTORICAL_MILESTONES: SagaMilestoneInfo[] = [
     title: 'Inauguración Misky S.A.',
     subtitle: 'Gran complejo de confitería en Tucumán',
     icon: '🍬',
-    cardId: 'card-misky-1974'
+    cardId: 'event-1970-1975-expansion-plantas'
   },
   {
     level: 30,
@@ -381,7 +381,7 @@ export const SAGA_HISTORICAL_MILESTONES: SagaMilestoneInfo[] = [
     title: 'Cartocor & Expansión Brasil',
     subtitle: 'Envases propios y fábrica en Brasil',
     icon: '📦',
-    cardId: 'card-cartocor-1980'
+    cardId: 'event-1980-cartocor'
   },
   {
     level: 33,
@@ -389,7 +389,7 @@ export const SAGA_HISTORICAL_MILESTONES: SagaMilestoneInfo[] = [
     title: 'Lanzamiento de Mogul',
     subtitle: 'Las primeras gomitas de fruta',
     icon: '🐻',
-    cardId: 'card-mogul-1983'
+    cardId: 'event-1980-cartocor'
   },
   {
     level: 34,
@@ -397,7 +397,7 @@ export const SAGA_HISTORICAL_MILESTONES: SagaMilestoneInfo[] = [
     title: 'Nace Bon o Bon',
     subtitle: 'El bombón insignia al mundo',
     icon: '✨',
-    cardId: 'card-bonobon-1984'
+    cardId: 'event-1984-bonobon'
   },
   {
     level: 35,
@@ -405,7 +405,7 @@ export const SAGA_HISTORICAL_MILESTONES: SagaMilestoneInfo[] = [
     title: 'Lanzamiento Butter Toffees',
     subtitle: 'Caramelos y toffees de leche',
     icon: '🧈',
-    cardId: 'card-toffee-1985'
+    cardId: 'event-1984-bonobon'
   },
   {
     level: 39,
@@ -413,7 +413,7 @@ export const SAGA_HISTORICAL_MILESTONES: SagaMilestoneInfo[] = [
     title: 'Semana de la Dulzura',
     subtitle: '"Una golosina por un beso" & Chile',
     icon: '💖',
-    cardId: 'card-semana-dulzura'
+    cardId: 'event-1989-semana-dulzura'
   },
   {
     level: 41,
@@ -421,7 +421,7 @@ export const SAGA_HISTORICAL_MILESTONES: SagaMilestoneInfo[] = [
     title: 'Creación Fundación Arcor',
     subtitle: 'Compromiso social con la niñez',
     icon: '🤝',
-    cardId: 'card-fundacion-social'
+    cardId: 'event-1989-semana-dulzura'
   },
   {
     level: 43,
@@ -429,7 +429,7 @@ export const SAGA_HISTORICAL_MILESTONES: SagaMilestoneInfo[] = [
     title: 'Luis Pagani & Águila',
     subtitle: 'Presidencia de Luis Pagani y Águila',
     icon: '🦅',
-    cardId: 'card-aguila-1993'
+    cardId: 'event-1990-1993-legado-luis-pagani'
   },
   {
     level: 46,
@@ -437,7 +437,7 @@ export const SAGA_HISTORICAL_MILESTONES: SagaMilestoneInfo[] = [
     title: 'Lanzamiento de Rocklets',
     subtitle: 'Confites de chocolate crocantes',
     icon: '🌈',
-    cardId: 'card-rocklets-1996'
+    cardId: 'event-1993-1998-grandes-adquisiciones'
   },
   {
     level: 48,
@@ -445,7 +445,7 @@ export const SAGA_HISTORICAL_MILESTONES: SagaMilestoneInfo[] = [
     title: 'Adquisición Dos en Uno',
     subtitle: 'Liderazgo en golosinas en Chile',
     icon: '🇨🇱',
-    cardId: 'card-dosenuno-1998'
+    cardId: 'event-1993-1998-grandes-adquisiciones'
   },
   {
     level: 51,
@@ -453,7 +453,7 @@ export const SAGA_HISTORICAL_MILESTONES: SagaMilestoneInfo[] = [
     title: 'Cincuentenario (50 Años)',
     subtitle: 'Medio siglo de historia y magia',
     icon: '🏆',
-    cardId: 'card-cincuentenario'
+    cardId: 'event-1999-braganca-internacional'
   },
   {
     level: 54,
@@ -461,7 +461,7 @@ export const SAGA_HISTORICAL_MILESTONES: SagaMilestoneInfo[] = [
     title: 'Bagley Latinoamérica',
     subtitle: 'Criollitas, Chocolinas, Opera, Rumba',
     icon: '🍪',
-    cardId: 'card-alianza-bagley-2004'
+    cardId: 'event-1999-braganca-internacional'
   },
   {
     level: 55,
@@ -469,7 +469,7 @@ export const SAGA_HISTORICAL_MILESTONES: SagaMilestoneInfo[] = [
     title: 'La Campagnola & Helados',
     subtitle: 'Mermeladas, conservas y heladería',
     icon: '🍅',
-    cardId: 'card-campagnola-2005'
+    cardId: 'event-2005-bagley-helados-campagnola'
   },
   {
     level: 60,
@@ -477,7 +477,7 @@ export const SAGA_HISTORICAL_MILESTONES: SagaMilestoneInfo[] = [
     title: 'Sustentabilidad & Sin TACC',
     subtitle: 'Compromiso verde y alimentos seguros',
     icon: '🌿',
-    cardId: 'card-sintacc-2010'
+    cardId: 'event-2009-arcorito-momentos-magicos'
   },
   {
     level: 65,
@@ -485,7 +485,7 @@ export const SAGA_HISTORICAL_MILESTONES: SagaMilestoneInfo[] = [
     title: 'Alianza La Serenísima',
     subtitle: 'Inversión en Mastellone Hermanos',
     icon: '🥛',
-    cardId: 'card-mastellone-2015'
+    cardId: 'event-2015-coca-cola-alianza'
   },
   {
     level: 67,
@@ -493,7 +493,7 @@ export const SAGA_HISTORICAL_MILESTONES: SagaMilestoneInfo[] = [
     title: 'Adquisición Zucamor',
     subtitle: 'Liderazgo en papel y envases',
     icon: '📦',
-    cardId: 'card-zucamor-2017'
+    cardId: 'event-2015-coca-cola-alianza'
   },
   {
     level: 68,
@@ -501,7 +501,7 @@ export const SAGA_HISTORICAL_MILESTONES: SagaMilestoneInfo[] = [
     title: 'Alianza Laboratorios Bagó',
     subtitle: 'Línea Simple de nutrición avanzada',
     icon: '💊',
-    cardId: 'card-bago-2018'
+    cardId: 'event-2015-coca-cola-alianza'
   },
   {
     level: 70,
@@ -509,7 +509,7 @@ export const SAGA_HISTORICAL_MILESTONES: SagaMilestoneInfo[] = [
     title: 'Energía 100% Renovable',
     subtitle: 'Parques eólicos y cuidado del planeta',
     icon: '🌬️',
-    cardId: 'card-sostenibilidad-2020'
+    cardId: 'event-2015-coca-cola-alianza'
   },
   {
     level: 71,
@@ -517,7 +517,7 @@ export const SAGA_HISTORICAL_MILESTONES: SagaMilestoneInfo[] = [
     title: '70° Aniversario Arcor',
     subtitle: 'Siete décadas de dulzura mundial',
     icon: '⭐',
-    cardId: 'card-70aniversario'
+    cardId: 'event-2021-inauguracion-angola'
   },
   {
     level: 72,
@@ -525,7 +525,7 @@ export const SAGA_HISTORICAL_MILESTONES: SagaMilestoneInfo[] = [
     title: 'Planta en Luanda, Angola',
     subtitle: 'Primera fábrica industrial en África',
     icon: '🌍',
-    cardId: 'card-angola-2022'
+    cardId: 'event-2021-inauguracion-angola'
   },
   {
     level: 75,
@@ -533,7 +533,7 @@ export const SAGA_HISTORICAL_MILESTONES: SagaMilestoneInfo[] = [
     title: '¡75 AÑOS DE DULZURA ARCOR!',
     subtitle: '1951 — 2026 · Gracias por hacer este sueño realidad',
     icon: '🏆',
-    cardId: 'card-arcor-hoy'
+    cardId: 'event-2026-arcor-75-aniversario'
   }
 ];
 

@@ -180,18 +180,36 @@ export class AchievementsManager {
   }
 
   private load(): void {
+    this.progressMap = {};
+
     try {
       const raw = localStorage.getItem(AchievementsManager.STORAGE_KEY);
       if (raw) {
-        this.progressMap = JSON.parse(raw);
+        const parsed = JSON.parse(raw);
+        if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+          this.progressMap = parsed;
+        } else {
+          console.warn('[AchievementsManager] Clave corrupta en achievements state. Poniendo en cuarentena (F-02).');
+          localStorage.setItem(`${AchievementsManager.STORAGE_KEY}_corrupted_${Date.now()}`, raw);
+        }
       }
     } catch (e) {
       console.warn('Error loading achievements:', e);
+      try {
+        const raw = localStorage.getItem(AchievementsManager.STORAGE_KEY);
+        if (raw) localStorage.setItem(`${AchievementsManager.STORAGE_KEY}_corrupted_${Date.now()}`, raw);
+      } catch {}
+    }
+
+    // Garantizar que this.progressMap siempre sea un objeto válido
+    if (!this.progressMap || typeof this.progressMap !== 'object' || Array.isArray(this.progressMap)) {
+      this.progressMap = {};
     }
 
     // Inicializar achievements no presentes
     ACHIEVEMENTS_CATALOG.forEach(ach => {
-      if (!this.progressMap[ach.id]) {
+      const existing = this.progressMap[ach.id];
+      if (!existing || typeof existing !== 'object') {
         this.progressMap[ach.id] = {
           unlocked: false,
           claimed: false,

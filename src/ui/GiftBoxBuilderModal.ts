@@ -781,32 +781,34 @@ export class GiftBoxBuilderModal {
     combined.forEach(candy => {
       const card = document.createElement('div');
       card.className = 'catalog-candy-card interactive';
-      card.setAttribute('draggable', 'true');
-      card.title = `Agregar ${candy.name} a la caja`;
+      const safeName = escapeHtml(candy.name);
+      const safeSub = escapeHtml(candy.subtitle);
+      const safeIcon = escapeHtml(candy.icon);
+      card.title = `Agregar ${safeName} a la caja`;
 
       // Thumb: foto real si existe, si no, fallback a emoji animado
       const thumbInner = candy.image
         ? `<img
             src="${candy.image}"
-            alt="${candy.name}"
+            alt="${safeName}"
             class="candy-product-photo"
             draggable="false"
             loading="lazy"
             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
           />
-          <span class="candy-pack-icon candy-pack-fallback" style="display:none">${candy.icon}</span>`
+          <span class="candy-pack-icon candy-pack-fallback" style="display:none">${safeIcon}</span>`
         : `<div class="candy-foil-glare"></div>
-           <span class="candy-pack-icon">${candy.icon}</span>`;
+           <span class="candy-pack-icon">${safeIcon}</span>`;
 
       card.innerHTML = `
         <div class="candy-card-thumb package-thumb-${candy.packageKind} ${candy.image ? 'has-photo' : ''}">
           <div class="candy-card-ambient-light"></div>
           ${thumbInner}
-          <button class="candy-add-btn interactive" title="Agregar ${candy.name} a la caja">＋</button>
+          <button class="candy-add-btn interactive" title="Agregar ${safeName} a la caja">＋</button>
         </div>
         <div class="candy-card-meta">
-          <span class="candy-card-name" title="${candy.name}">${candy.name}</span>
-          <span class="candy-card-sub" title="${candy.subtitle}">${candy.subtitle}</span>
+          <span class="candy-card-name" title="${safeName}">${safeName}</span>
+          <span class="candy-card-sub" title="${safeSub}">${safeSub}</span>
         </div>
       `;
 

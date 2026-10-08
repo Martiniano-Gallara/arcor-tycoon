@@ -177,17 +177,17 @@ export class Match3Renderer {
   }
 
   private setupListeners(): void {
-    const getPos = (e: MouseEvent | TouchEvent) => {
+    this.canvas.style.touchAction = 'none';
+
+    const getPos = (e: PointerEvent | MouseEvent) => {
       const rect = this.canvas.getBoundingClientRect();
-      const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
-      const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
       return {
-        x: clientX - rect.left,
-        y: clientY - rect.top
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top
       };
     };
 
-    const onPointerDown = (e: MouseEvent | TouchEvent) => {
+    const onPointerDown = (e: PointerEvent) => {
       this.idleTime = 0;
       this.currentHint = null;
       if (this.engine.isBusy || this.engine.isGameOver) return;
@@ -196,10 +196,17 @@ export class Match3Renderer {
       const row = Math.floor(pos.y / this.tileSize);
 
       if (row >= 0 && row < Match3Engine.ROWS && col >= 0 && col < Match3Engine.COLS) {
-        // Manejo de Boosters (se descuentan únicamente al ejecutarse en el tablero - M3-04)
+        // Manejo de Boosters (se descuentan únicamente al ejecutarse con éxito en el tablero - F-05)
         if (this.activeBooster === 'hammer') {
-          if (gameState.useMatch3Booster('hammer')) {
-            this.engine.useBoosterHammer(row, col);
+          if (!this.engine.isBusy && !this.engine.isGameOver && this.engine.inBounds(row, col) && this.engine.grid[row][col]) {
+            if (gameState.useMatch3Booster('hammer')) {
+              const used = this.engine.useBoosterHammer(row, col);
+              if (!used) {
+                const d = gameState.getData() as any;
+                if (d.match3Boosters) d.match3Boosters.hammer = (d.match3Boosters.hammer || 0) + 1;
+                gameState.notify();
+              }
+            }
           }
           this.activeBooster = null;
           this.onBoosterChanged?.(null);
@@ -207,8 +214,15 @@ export class Match3Renderer {
         }
 
         if (this.activeBooster === 'mega_rocklet') {
-          if (gameState.useMatch3Booster('rocklet')) {
-            this.engine.useBoosterMegaRocklet(row, col);
+          if (!this.engine.isBusy && !this.engine.isGameOver && this.engine.inBounds(row, col) && this.engine.grid[row][col]) {
+            if (gameState.useMatch3Booster('rocklet')) {
+              const used = this.engine.useBoosterMegaRocklet(row, col);
+              if (!used) {
+                const d = gameState.getData() as any;
+                if (d.match3Boosters) d.match3Boosters.rocklet = (d.match3Boosters.rocklet || 0) + 1;
+                gameState.notify();
+              }
+            }
           }
           this.activeBooster = null;
           this.onBoosterChanged?.(null);
@@ -220,9 +234,23 @@ export class Match3Renderer {
             this.firstSwapCell = { row, col };
             this.onBoosterChanged?.('swap');
           } else {
-            if (this.firstSwapCell.row !== row || this.firstSwapCell.col !== col) {
+            const r1 = this.firstSwapCell.row;
+            const c1 = this.firstSwapCell.col;
+            const r2 = row;
+            const c2 = col;
+            const dist = Math.abs(r1 - r2) + Math.abs(c1 - c2);
+
+            // Validar adyacencia (distancia == 1) ANTES de descontar booster (F-05)
+            if ((r1 !== r2 || c1 !== c2) && dist === 1 && !this.engine.isBusy && !this.engine.isGameOver) {
               if (gameState.useMatch3Booster('swap')) {
-                this.engine.useBoosterSwap(this.firstSwapCell.row, this.firstSwapCell.col, row, col);
+                const success = this.engine.useBoosterSwap(r1, c1, r2, c2);
+                if (!success) {
+                  const d = gameState.getData() as any;
+                  if (d.match3Boosters) {
+                    d.match3Boosters.swap = (d.match3Boosters.swap || 0) + 1;
+                    gameState.notify();
+                  }
+                }
               }
             }
             this.firstSwapCell = null;
@@ -250,7 +278,7 @@ export class Match3Renderer {
       }
     };
 
-    const onPointerMove = (e: MouseEvent | TouchEvent) => {
+    const onPointerMove = (e: PointerEvent) => {
       this.idleTime = 0;
       if (!this.isDragging || !this.selectedCell || !this.dragStartPos) return;
       const pos = getPos(e);
@@ -289,14 +317,10 @@ export class Match3Renderer {
       this.dragOffset = { x: 0, y: 0 };
     };
 
-    this.canvas.addEventListener('mousedown', onPointerDown);
-    window.addEventListener('mousemove', onPointerMove);
-    window.addEventListener('mouseup', onPointerUp);
-
-    this.canvas.addEventListener('touchstart', onPointerDown, { passive: true });
-    window.addEventListener('touchmove', onPointerMove, { passive: true });
-    window.addEventListener('touchend', onPointerUp, { passive: true });
-    window.addEventListener('touchcancel', onPointerUp, { passive: true });
+    this.canvas.addEventListener('pointerdown', onPointerDown as any);
+    window.addEventListener('pointermove', onPointerMove as any);
+    window.addEventListener('pointerup', onPointerUp);
+    window.addEventListener('pointercancel', onPointerUp);
     window.addEventListener('blur', onPointerUp);
 
     window.addEventListener('resize', this.onWindowResize);

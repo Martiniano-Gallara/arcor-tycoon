@@ -55,7 +55,7 @@ export const MILESTONE_BANNERS: MilestoneBannerDefinition[] = [
     year: 1951,
     xPercent: 5.5,
     yPercent: 26.0,
-    cardId: 'card-fundacion-1951'
+    cardId: 'event-1951-fundacion'
   },
   {
     id: 'banner-primeros',
@@ -64,7 +64,7 @@ export const MILESTONE_BANNERS: MilestoneBannerDefinition[] = [
     year: 1953,
     xPercent: 37.0,
     yPercent: 26.0,
-    cardId: 'card-primer-galpon'
+    cardId: 'event-1953-capacidad-inicial'
   },
   {
     id: 'banner-80s',
@@ -73,7 +73,7 @@ export const MILESTONE_BANNERS: MilestoneBannerDefinition[] = [
     year: 1984,
     xPercent: 8.5,
     yPercent: 62.0,
-    cardId: 'card-bonobon-1984'
+    cardId: 'event-1984-bonobon'
   },
   {
     id: 'banner-2000s',
@@ -82,7 +82,7 @@ export const MILESTONE_BANNERS: MilestoneBannerDefinition[] = [
     year: 2004,
     xPercent: 88.0,
     yPercent: 71.0,
-    cardId: 'card-alianza-bagley-2004'
+    cardId: 'event-2005-bagley-helados-campagnola'
   },
   {
     id: 'banner-2020s',
@@ -91,16 +91,16 @@ export const MILESTONE_BANNERS: MilestoneBannerDefinition[] = [
     year: 2021,
     xPercent: 72.0,
     yPercent: 55.0,
-    cardId: 'card-sostenibilidad-2020'
+    cardId: 'event-2021-inauguracion-angola'
   },
   {
     id: 'banner-hoy',
     title: '75 Años',
     subtitle: 'Un mundo más dulce, para todos ♡',
-    year: 2025,
+    year: 2026,
     xPercent: 92.0,
     yPercent: 24.0,
-    cardId: 'card-arcor-hoy'
+    cardId: 'event-2026-arcor-75-aniversario'
   }
 ];
 
@@ -370,13 +370,30 @@ export class ProgressionState {
       const currentLives = data.lives ?? 5;
       if (currentLives >= ProgressionState.MAX_LIVES) return;
 
-      const lastTime = data.lastLifeLostTimestamp || Date.now();
-      const elapsedSeconds = Math.floor((Date.now() - lastTime) / 1000);
+      const now = Date.now();
+      const maxSeen = data.maxSeenTimestamp || 0;
+      if (now > maxSeen) {
+        data.maxSeenTimestamp = now;
+      } else if (now < maxSeen - 60000) {
+        // Reloj del sistema fue manipulado hacia atrás: restablecer referencia para evitar desincronización
+        data.lastLifeLostTimestamp = now;
+        data.maxSeenTimestamp = now;
+      }
+
+      let lastTime = data.lastLifeLostTimestamp || now;
+      if (lastTime > now) {
+        // Marca en el futuro (reloj adelantado previamente): corregir inmediatamente para evitar bloqueo
+        lastTime = now;
+        data.lastLifeLostTimestamp = now;
+      }
+
+      const elapsedSeconds = Math.max(0, Math.floor((now - lastTime) / 1000));
 
       if (elapsedSeconds >= ProgressionState.REGEN_TIME_SECONDS) {
         const recovered = Math.floor(elapsedSeconds / ProgressionState.REGEN_TIME_SECONDS);
         data.lives = Math.min(ProgressionState.MAX_LIVES, currentLives + recovered);
-        data.lastLifeLostTimestamp = Date.now() - ((elapsedSeconds % ProgressionState.REGEN_TIME_SECONDS) * 1000);
+        data.lastLifeLostTimestamp = now - ((elapsedSeconds % ProgressionState.REGEN_TIME_SECONDS) * 1000);
+        data.maxSeenTimestamp = now;
         gameState.notify();
         this.notify();
       }
@@ -392,8 +409,12 @@ export class ProgressionState {
     }
 
     const data = gameState.getData();
-    const lastTime = data.lastLifeLostTimestamp || Date.now();
-    const elapsed = Math.floor((Date.now() - lastTime) / 1000);
+    const now = Date.now();
+    let lastTime = data.lastLifeLostTimestamp || now;
+    if (lastTime > now) {
+      lastTime = now;
+    }
+    const elapsed = Math.max(0, Math.floor((now - lastTime) / 1000));
     const rem = Math.max(0, ProgressionState.REGEN_TIME_SECONDS - (elapsed % ProgressionState.REGEN_TIME_SECONDS));
 
     const mins = Math.floor(rem / 60);

@@ -417,15 +417,54 @@ export class CustomizationManager {
   }
 
   private loadFromStorage(): void {
+    this.customProducts = [];
+    this.giftBoxes = [];
+
     try {
       const rawP = localStorage.getItem(CustomizationManager.KEY_PRODUCTS);
-      if (rawP) this.customProducts = JSON.parse(rawP);
-
-      const rawB = localStorage.getItem(CustomizationManager.KEY_BOXES);
-      if (rawB) this.giftBoxes = JSON.parse(rawB);
+      if (rawP) {
+        const parsedP = JSON.parse(rawP);
+        if (Array.isArray(parsedP)) {
+          this.customProducts = parsedP.filter(
+            (p: any) => p && typeof p === 'object' && typeof p.id === 'string' && typeof p.name === 'string'
+          );
+        } else {
+          console.warn('[CustomizationManager] Clave corrupta detectada en custom products. Poniendo en cuarentena (F-02).');
+          localStorage.setItem(`${CustomizationManager.KEY_PRODUCTS}_corrupted_${Date.now()}`, rawP);
+        }
+      }
     } catch (e) {
-      console.warn('Error loading custom products or gift boxes:', e);
+      console.warn('[CustomizationManager] Error parseando custom products:', e);
+      try {
+        const rawP = localStorage.getItem(CustomizationManager.KEY_PRODUCTS);
+        if (rawP) localStorage.setItem(`${CustomizationManager.KEY_PRODUCTS}_corrupted_${Date.now()}`, rawP);
+      } catch {}
     }
+
+    try {
+      const rawB = localStorage.getItem(CustomizationManager.KEY_BOXES);
+      if (rawB) {
+        const parsedB = JSON.parse(rawB);
+        if (Array.isArray(parsedB)) {
+          this.giftBoxes = parsedB.filter(
+            (b: any) => b && typeof b === 'object' && typeof b.id === 'string'
+          );
+        } else {
+          console.warn('[CustomizationManager] Clave corrupta detectada en gift boxes. Poniendo en cuarentena (F-02).');
+          localStorage.setItem(`${CustomizationManager.KEY_BOXES}_corrupted_${Date.now()}`, rawB);
+        }
+      }
+    } catch (e) {
+      console.warn('[CustomizationManager] Error parseando gift boxes:', e);
+      try {
+        const rawB = localStorage.getItem(CustomizationManager.KEY_BOXES);
+        if (rawB) localStorage.setItem(`${CustomizationManager.KEY_BOXES}_corrupted_${Date.now()}`, rawB);
+      } catch {}
+    }
+
+    // Garantizar que siempre sean arreglos iterables válidos
+    if (!Array.isArray(this.customProducts)) this.customProducts = [];
+    if (!Array.isArray(this.giftBoxes)) this.giftBoxes = [];
   }
 
   private saveToStorage(): void {

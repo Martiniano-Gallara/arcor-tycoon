@@ -1,5 +1,5 @@
-import { ERAS_DEFINITION, HistoricalEvent, getAllChronologicalEvents } from './historyEras.ts';
-import { gameState, LEVEL_YEARS } from './GameState.ts';
+import { ERAS_DEFINITION, HistoricalEvent, getAllChronologicalEvents, LEVEL_TO_EVENT_ID } from './historyEras.ts';
+import { gameState } from './GameState.ts';
 
 export type EventCompletedListener = (event: HistoricalEvent) => void;
 export type DecisionRequiredListener = (event: HistoricalEvent) => void;
@@ -25,14 +25,8 @@ export class QuestManager {
   public getCurrentEvent(): HistoricalEvent | null {
     const data = gameState.getData();
     const currentLevel = data.match3CurrentLevel || 1;
-    const targetYear = LEVEL_YEARS[currentLevel] || 1951;
-
-    // Buscar el evento histórico verificado para este año
-    const found = this.allEvents.find(e => e.year === targetYear)
-      || this.allEvents.find(e => Math.abs(e.year - targetYear) <= 2)
-      || this.allEvents[Math.min(currentLevel, this.allEvents.length - 1)];
-
-    return found || null;
+    const eventId = LEVEL_TO_EVENT_ID[currentLevel] || 'event-1951-fundacion';
+    return this.allEvents.find(e => e.id === eventId) || this.allEvents[0] || null;
   }
 
   /**
@@ -65,9 +59,8 @@ export class QuestManager {
    * Completa el hito histórico del nivel superado y notifica a los suscriptores
    */
   public completeMilestoneForLevel(level: number): HistoricalEvent | null {
-    const targetYear = LEVEL_YEARS[level] || 1951;
-    const event = this.allEvents.find(e => e.year === targetYear)
-      || this.allEvents.find(e => Math.abs(e.year - targetYear) <= 2);
+    const eventId = LEVEL_TO_EVENT_ID[level];
+    const event = eventId ? this.allEvents.find(e => e.id === eventId) : null;
 
     if (event) {
       if (this.completedEventIds.has(event.id)) {

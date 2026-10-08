@@ -571,9 +571,20 @@ export class Match3HUD {
   }
 
   /**
-   * Abre la pantalla del Match-3 e inicializa el nivel
+   * Abre la pantalla del Match-3 e inicializa el nivel tras validar y descontar vidas de forma centralizada (F-03)
    */
-  public show(levelNumber?: number): void {
+  public show(levelNumber?: number): boolean {
+    const lives = progressionState.getLives();
+    if (lives <= 0) {
+      if (this.onOpenQuizRequested) {
+        this.onOpenQuizRequested();
+      }
+      return false;
+    }
+
+    // Regla de vidas centralizada: gastar 1 vida al arrancar un nivel (F-03)
+    progressionState.useLife();
+
     const data = gameState.getData();
     const lvl = levelNumber || data.match3CurrentLevel || 1;
 
@@ -625,6 +636,7 @@ export class Match3HUD {
 
     this.updateHUD();
     this.updateBoostersDisplay();
+    return true;
   }
 
   public hide(): void {

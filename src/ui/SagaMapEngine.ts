@@ -414,7 +414,6 @@ export class SagaMapEngine {
         }
         return;
       }
-      progressionState.useLife();
       soundManager.playFanfare();
       if (this.onPlayLevelRequested) {
         this.onPlayLevelRequested(currentLevel);

@@ -57,6 +57,7 @@ export interface GameSaveData {
   lives: number;
   maxLives: number;
   lastLifeLostTimestamp: number;
+  maxSeenTimestamp?: number;
   levelHighScores?: Record<number, number>;
 
   // Museo del Sabor - 75 Años de Arcor
@@ -220,36 +221,51 @@ export function sanitizeSave(raw: any): GameSaveData {
     return def;
   }
 
-  // Validación numérica y bounds de dinero (PER-05)
-  let money = Number(raw.money);
-  if (!Number.isFinite(money) || money < 0) {
+  // Validación numérica y bounds de dinero estrictos (PER-05, F-08)
+  let money: number;
+  if (typeof raw.money !== 'number' || !Number.isFinite(raw.money) || raw.money < 0) {
     money = def.money;
   } else {
-    money = Math.min(1e12, money);
+    money = Math.min(1e12, raw.money);
   }
 
   // Validación de nivel y estrellas
-  let level = Math.floor(Number(raw.match3CurrentLevel));
-  if (!Number.isFinite(level) || level < 1 || level > 75) {
-    level = Math.max(1, Math.min(75, Number.isFinite(level) ? level : 1));
+  let level: number;
+  if (typeof raw.match3CurrentLevel !== 'number' || !Number.isFinite(raw.match3CurrentLevel)) {
+    level = def.match3CurrentLevel;
+  } else {
+    level = Math.max(1, Math.min(75, Math.floor(raw.match3CurrentLevel)));
   }
 
-  let stars = Math.floor(Number(raw.match3Stars));
-  if (!Number.isFinite(stars) || stars < 0) stars = 0;
-  stars = Math.min(225, stars);
+  let stars: number;
+  if (typeof raw.match3Stars !== 'number' || !Number.isFinite(raw.match3Stars) || raw.match3Stars < 0) {
+    stars = 0;
+  } else {
+    stars = Math.min(225, Math.floor(raw.match3Stars));
+  }
 
-  let lives = Math.floor(Number(raw.lives));
-  if (!Number.isFinite(lives) || lives < 0) lives = 5;
-  lives = Math.min(5, Math.max(0, lives));
+  let lives: number;
+  if (typeof raw.lives !== 'number' || !Number.isFinite(raw.lives)) {
+    lives = 5;
+  } else {
+    lives = Math.max(0, Math.min(5, Math.floor(raw.lives)));
+  }
 
-  let year = Math.floor(Number(raw.currentYear));
-  if (!Number.isFinite(year) || year < 1951 || year > 2026) year = 1951;
+  let year: number;
+  if (typeof raw.currentYear !== 'number' || !Number.isFinite(raw.currentYear) || raw.currentYear < 1951 || raw.currentYear > 2026) {
+    year = 1951;
+  } else {
+    year = Math.floor(raw.currentYear);
+  }
 
-  let month = Math.floor(Number(raw.currentMonth));
-  if (!Number.isFinite(month) || month < 1 || month > 12) month = 6;
+  let month: number;
+  if (typeof raw.currentMonth !== 'number' || !Number.isFinite(raw.currentMonth) || raw.currentMonth < 1 || raw.currentMonth > 12) {
+    month = 6;
+  } else {
+    month = Math.floor(raw.currentMonth);
+  }
 
-  let rep = Number(raw.reputation);
-  if (!Number.isFinite(rep) || rep < 0) rep = 1;
+  let rep = typeof raw.reputation === 'number' && Number.isFinite(raw.reputation) && raw.reputation >= 0 ? raw.reputation : 1;
 
   // Arrays seguros
   const completedQuests = Array.isArray(raw.completedQuests)
@@ -265,11 +281,26 @@ export function sanitizeSave(raw: any): GameSaveData {
     : [...def.unlockedParcels];
 
   const buildings = Array.isArray(raw.buildings)
-    ? raw.buildings.filter((b: any) => b && typeof b.id === 'string' && typeof b.typeId === 'string')
+    ? raw.buildings
+        .filter((b: any) => b && typeof b === 'object' && typeof b.id === 'string' && typeof b.typeId === 'string')
+        .map((b: any) => ({
+          id: String(b.id),
+          typeId: String(b.typeId),
+          gridX: Number.isFinite(Number(b.gridX)) ? Math.floor(Number(b.gridX)) : 0,
+          gridZ: Number.isFinite(Number(b.gridZ)) ? Math.floor(Number(b.gridZ)) : 0,
+          rotation: Number.isFinite(Number(b.rotation)) ? ((Math.floor(Number(b.rotation)) % 4) + 4) % 4 : 0,
+          level: Number.isFinite(Number(b.level)) && Number(b.level) >= 1 ? Math.floor(Number(b.level)) : 1
+        }))
     : [...def.buildings];
 
   const roads = Array.isArray(raw.roads)
-    ? raw.roads.filter((r: any) => r && typeof r.gridX === 'number' && typeof r.gridZ === 'number')
+    ? raw.roads
+        .filter((r: any) => r && typeof r === 'object' && Number.isFinite(Number(r.gridX)) && Number.isFinite(Number(r.gridZ)))
+        .map((r: any) => ({
+          gridX: Math.floor(Number(r.gridX)),
+          gridZ: Math.floor(Number(r.gridZ)),
+          type: (r.type === 'cobblestone' ? 'cobblestone' : 'dirt') as 'dirt' | 'cobblestone'
+        }))
     : [...def.roads];
 
   // Boosters acotados
@@ -284,6 +315,18 @@ export function sanitizeSave(raw: any): GameSaveData {
       const starVal = Number(v);
       if (Number.isFinite(numKey) && numKey >= 1 && numKey <= 75 && Number.isFinite(starVal)) {
         levelStars[numKey] = Math.max(0, Math.min(3, Math.floor(starVal)));
+      }
+    }
+  }
+
+  // Puntuaciones máximas por nivel (1..75 -> >= 0)
+  const levelHighScores: Record<number, number> = {};
+  if (raw.levelHighScores && typeof raw.levelHighScores === 'object') {
+    for (const [k, v] of Object.entries(raw.levelHighScores)) {
+      const numKey = Number(k);
+      const scoreVal = Number(v);
+      if (Number.isFinite(numKey) && numKey >= 1 && numKey <= 75 && Number.isFinite(scoreVal) && scoreVal >= 0) {
+        levelHighScores[numKey] = Math.floor(scoreVal);
       }
     }
   }
@@ -323,6 +366,7 @@ export function sanitizeSave(raw: any): GameSaveData {
     match3CurrentLevel: level,
     match3Stars: stars,
     match3LevelStars: levelStars,
+    levelHighScores,
     match3Boosters: {
       hammer: clampBooster(boosters.hammer),
       swap: clampBooster(boosters.swap),
@@ -333,6 +377,7 @@ export function sanitizeSave(raw: any): GameSaveData {
     lives,
     maxLives: 5,
     lastLifeLostTimestamp: Number.isFinite(Number(raw.lastLifeLostTimestamp)) ? Number(raw.lastLifeLostTimestamp) : Date.now(),
+    maxSeenTimestamp: Number.isFinite(Number(raw.maxSeenTimestamp)) ? Number(raw.maxSeenTimestamp) : Date.now(),
     discoveredMuseumCandies: Array.isArray(raw.discoveredMuseumCandies)
       ? raw.discoveredMuseumCandies.filter((x: any) => typeof x === 'string')
       : [],
@@ -392,7 +437,10 @@ export class SaveManager {
         const rawBackup = localStorage.getItem(BACKUP_KEY);
         if (rawBackup) {
           try {
-            return sanitizeSave(JSON.parse(rawBackup));
+            const parsedBackup = JSON.parse(rawBackup);
+            if (parsedBackup && typeof parsedBackup === 'object' && !Array.isArray(parsedBackup)) {
+              return sanitizeSave(parsedBackup);
+            }
           } catch {
             // Ignorar y continuar al default
           }
@@ -401,9 +449,12 @@ export class SaveManager {
       }
 
       const parsed = JSON.parse(raw);
+      if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+        throw new Error('Save data is not a valid object');
+      }
       return sanitizeSave(parsed);
     } catch (e) {
-      console.warn('[SaveManager] Error o archivo corrupto en guardado principal. Activando recuperación (PER-04):', e);
+      console.warn('[SaveManager] Error o archivo corrupto en guardado principal. Activando recuperación (PER-04, F-08):', e);
       try {
         // Archivar el guardado corrupto para no destruirlo silenciosamente
         const corruptedRaw = localStorage.getItem(STORAGE_KEY);
@@ -413,9 +464,12 @@ export class SaveManager {
         // Intentar rescatar el respaldo anterior
         const backupRaw = localStorage.getItem(BACKUP_KEY);
         if (backupRaw) {
-          const rescued = sanitizeSave(JSON.parse(backupRaw));
-          console.info('[SaveManager] Partida recuperada exitosamente desde el respaldo.');
-          return rescued;
+          const parsedBackup = JSON.parse(backupRaw);
+          if (parsedBackup && typeof parsedBackup === 'object' && !Array.isArray(parsedBackup)) {
+            const rescued = sanitizeSave(parsedBackup);
+            console.info('[SaveManager] Partida recuperada exitosamente desde el respaldo.');
+            return rescued;
+          }
         }
       } catch (backupErr) {
         console.error('[SaveManager] Respaldo también inaccesible:', backupErr);
@@ -458,8 +512,11 @@ export class SaveManager {
       localStorage.removeItem(`${STORAGE_KEY}_backup`);
       localStorage.removeItem('arcor_tycoon_save');
       localStorage.removeItem('arcor_achievements_v1');
+      localStorage.removeItem('arcor_achievements_state_v1');
       localStorage.removeItem('arcor_custom_products');
+      localStorage.removeItem('arcor_custom_products_v1');
       localStorage.removeItem('arcor_gift_boxes');
+      localStorage.removeItem('arcor_gift_boxes_v1');
       localStorage.removeItem('arcor_quiz_recent_ids');
       localStorage.removeItem('arcor_quiz_daily_lives');
     } catch (e) {
@@ -476,9 +533,10 @@ export class SaveManager {
     try {
       const parsed = JSON.parse(jsonStr);
       // Validación y saneamiento estricto (PER-03)
-      if (parsed && typeof parsed === 'object') {
+      if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
         const sanitized = sanitizeSave(parsed);
         this.save(sanitized);
+        this.externalListeners.forEach(cb => cb(sanitized));
         return sanitized;
       }
     } catch (e) {

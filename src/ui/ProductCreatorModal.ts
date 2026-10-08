@@ -674,13 +674,16 @@ export class ProductCreatorModal {
   }
 
   private handleFinishProduct(): void {
+    const sanitizedName = (this.productName || 'Nueva Golosina Arcor').trim().slice(0, 40).replace(/[<>&"']/g, '');
+    const sanitizedFlavor = (this.productFlavor || 'Edición Artesanal de Fábrica').trim().slice(0, 80).replace(/[<>&"']/g, '');
+
     let saved: any;
     try {
       saved = customizationManager.saveCustomProduct({
         brand: this.selectedBrand,
         packaging: this.selectedPackaging,
-        name: this.productName,
-        flavorOrMessage: this.productFlavor,
+        name: sanitizedName,
+        flavorOrMessage: sanitizedFlavor,
         colorThemeId: this.selectedColorThemeId,
         selectedStickers: Array.from(this.selectedStickers)
       });

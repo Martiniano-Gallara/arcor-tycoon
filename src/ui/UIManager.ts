@@ -84,8 +84,7 @@ export class UIManager {
     // Saga Map interactivo de progresión
     this.sagaMapEngine = new SagaMapEngine(this.metaBridge, this.historicalCardModal);
     this.sagaMapEngine.onPlayLevelRequested = (lvl) => {
-      this.sagaMapEngine.hide();
-      this.match3HUD.show(lvl);
+      this.tryStartLevel(lvl);
     };
     this.sagaMapEngine.onOpenFactoryRequested = () => {
       this.sagaMapEngine.hide();
@@ -162,9 +161,7 @@ export class UIManager {
     };
     this.myCollectionModal.onPlayMatch3Requested = () => {
       this.myCollectionModal.hide();
-      const currentLevel = progressionState.getCurrentLevel();
-      this.gameplayHUD.hide();
-      this.match3HUD.show(currentLevel);
+      this.tryStartLevel();
     };
 
     this.sagaMapEngine.onOpenProductCreatorRequested = () => {
@@ -226,9 +223,7 @@ export class UIManager {
         this.sagaMapEngine.show();
       },
       onPlayLevel: () => {
-        const currentLevel = progressionState.getCurrentLevel();
-        this.gameplayHUD.hide();
-        this.match3HUD.show(currentLevel);
+        this.tryStartLevel();
       },
       onOpenHistory: () => {
         this.archiveModal.show();
@@ -247,9 +242,7 @@ export class UIManager {
         this.sagaMapEngine.show();
       },
       onPlayArcorCrushLatest: () => {
-        const currentLevel = progressionState.getCurrentLevel();
-        this.gameplayHUD.hide();
-        this.match3HUD.show(currentLevel);
+        this.tryStartLevel();
       },
       onOpenHistory: () => {
         this.archiveModal.show();
@@ -499,5 +492,27 @@ export class UIManager {
     }
 
     window.addEventListener('hashchange', handleHash);
+  }
+
+  /**
+   * Punto de entrada único centralizado para iniciar cualquier nivel de Match-3 (F-03)
+   */
+  public tryStartLevel(level?: number): boolean {
+    const currentLevel = level || progressionState.getCurrentLevel();
+    const lives = progressionState.getLives();
+    if (lives <= 0) {
+      this.gameplayHUD.showToast('¡No te quedan vidas! ❤️ Realizá la Trivia para recargar.');
+      this.openQuiz('gameplay');
+      return false;
+    }
+
+    const started = this.match3HUD.show(currentLevel);
+    if (started) {
+      this.gameplayHUD.hide();
+      this.sagaMapEngine.hide();
+      this.arcoritoGuideModal.hide();
+      this.myCollectionModal.hide();
+    }
+    return started;
   }
 }

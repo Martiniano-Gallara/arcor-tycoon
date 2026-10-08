@@ -1,4 +1,4 @@
-import { SaveManager, GameSaveData, createDefaultSaveData, PlacedBuildingSave, WorkerSaveData } from '../core/SaveManager.ts';
+import { SaveManager, GameSaveData, createDefaultSaveData, sanitizeSave, PlacedBuildingSave, WorkerSaveData } from '../core/SaveManager.ts';
 import { ERAS_DEFINITION, EraDefinition, HistoricalEvent } from './historyEras.ts';
 import { QuestManager } from './QuestManager.ts';
 import { LogisticsSystem, DeliveryContract } from './LogisticsSystem.ts';
@@ -112,6 +112,23 @@ export class GameState {
     if (this.saveDebounceTimer) {
       clearTimeout(this.saveDebounceTimer);
       this.saveDebounceTimer = null;
+    }
+    // F-07: Comprobar si localStorage fue modificado externamente con una versión más reciente
+    try {
+      if (typeof localStorage !== 'undefined') {
+        const storedRaw = localStorage.getItem('arcor_tycoon_save_v2');
+        if (storedRaw) {
+          const parsed = JSON.parse(storedRaw);
+          if (parsed && typeof parsed === 'object' && Number(parsed.savedAt) > (this.data.savedAt || 0)) {
+            // El almacenamiento externo es más reciente que el estado en memoria; sincronizar en lugar de pisar
+            this.data = sanitizeSave(parsed);
+            this.listeners.forEach(cb => cb(this.data));
+            return;
+          }
+        }
+      }
+    } catch {
+      // Ignorar error al leer storage
     }
     this.data.lastActiveTimestamp = Date.now();
     SaveManager.save(this.data);

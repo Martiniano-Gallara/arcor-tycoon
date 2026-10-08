@@ -31,14 +31,21 @@ export class GameLoop {
   private loop(currentTime: number): void {
     if (!this.isRunning) return;
 
+    // Reprogramar el siguiente frame primero para evitar que una excepción detenga el bucle (F-04)
+    this.animationFrameId = requestAnimationFrame(this.loop);
+
     let delta = (currentTime - this.lastTime) / 1000;
     if (delta > this.maxDelta) delta = this.maxDelta;
     this.lastTime = currentTime;
 
     const elapsed = currentTime / 1000;
-    this.renderCallbacks.forEach(cb => cb(delta, elapsed));
-
-    this.animationFrameId = requestAnimationFrame(this.loop);
+    for (const cb of this.renderCallbacks) {
+      try {
+        cb(delta, elapsed);
+      } catch (err) {
+        console.error('Error en callback de render de GameLoop:', err);
+      }
+    }
   }
 }
 

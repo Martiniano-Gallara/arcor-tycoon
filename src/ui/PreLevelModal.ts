@@ -173,8 +173,6 @@ export class PreLevelModal {
         return;
       }
 
-      // Consumir 1 vida e iniciar
-      progressionState.useLife();
       soundManager.playFanfare();
       const lvl = this.currentLevelDef.levelNumber;
       this.hide();

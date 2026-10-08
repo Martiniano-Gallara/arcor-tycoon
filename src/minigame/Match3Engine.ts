@@ -191,7 +191,7 @@ export class Match3Engine {
   public onLevelWon?: (stars: number, score: number, coins: number, level?: number) => void;
   public onLevelLost?: () => void;
 
-  private inBounds(r: number, c: number): boolean {
+  public inBounds(r: number, c: number): boolean {
     return r >= 0 && r < Match3Engine.ROWS && c >= 0 && c < Match3Engine.COLS;
   }
 
@@ -479,13 +479,19 @@ export class Match3Engine {
       }
     }
 
-    // Identificar intersecciones en T o L (Bomba de Chocolate)
+    // Identificar intersecciones en T o L (Bomba de Chocolate) sin duplicar grupos ni celdas (F-10)
+    const usedHoriz = new Set<number>();
+    const usedVert = new Set<number>();
     const processedPieces = new Set<string>();
 
-    horizMatches.forEach(hLine => {
-      vertMatches.forEach(vLine => {
+    horizMatches.forEach((hLine, hIdx) => {
+      if (usedHoriz.has(hIdx)) return;
+      vertMatches.forEach((vLine, vIdx) => {
+        if (usedVert.has(vIdx)) return;
         const common = hLine.find(hp => vLine.some(vp => vp.id === hp.id));
         if (common) {
+          usedHoriz.add(hIdx);
+          usedVert.add(vIdx);
           const combined = Array.from(new Set([...hLine, ...vLine]));
           combined.forEach(p => processedPieces.add(p.id));
           results.push({
@@ -497,9 +503,9 @@ export class Match3Engine {
       });
     });
 
-    // Añadir líneas restantes
-    horizMatches.forEach(line => {
-      if (!line.some(p => processedPieces.has(p.id))) {
+    // Añadir líneas restantes que no formaron parte de una T/L
+    horizMatches.forEach((line, hIdx) => {
+      if (!usedHoriz.has(hIdx) && !line.some(p => processedPieces.has(p.id))) {
         line.forEach(p => processedPieces.add(p.id));
         results.push({
           pieces: line,
@@ -509,8 +515,8 @@ export class Match3Engine {
       }
     });
 
-    vertMatches.forEach(line => {
-      if (!line.some(p => processedPieces.has(p.id))) {
+    vertMatches.forEach((line, vIdx) => {
+      if (!usedVert.has(vIdx) && !line.some(p => processedPieces.has(p.id))) {
         line.forEach(p => processedPieces.add(p.id));
         results.push({
           pieces: line,
