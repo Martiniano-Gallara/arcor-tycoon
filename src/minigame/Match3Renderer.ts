@@ -1,5 +1,6 @@
 import { Match3Engine, CandyPiece, CandyType } from './Match3Engine.ts';
 import { candySpriteAtlas } from './CandySpriteAtlas.ts';
+import { gameState } from '../gameplay/GameState.ts';
 
 interface Particle {
   x: number;
@@ -69,7 +70,15 @@ export class Match3Renderer {
   // Animación loop y resize listener
   private animId: number = 0;
   private lastTime: number = 0;
+  private isPaused: boolean = false;
   private onWindowResize = () => this.resize();
+  private onVisibilityChange = () => {
+    if (document.hidden) {
+      this.pause();
+    } else {
+      this.resume();
+    }
+  };
 
   constructor(canvas: HTMLCanvasElement, engine: Match3Engine) {
     this.canvas = canvas;
@@ -80,6 +89,7 @@ export class Match3Renderer {
     this.setupListeners();
     this.setupEngineHooks();
     this.resize();
+    document.addEventListener('visibilitychange', this.onVisibilityChange);
     this.startRenderLoop();
   }
 
@@ -186,16 +196,20 @@ export class Match3Renderer {
       const row = Math.floor(pos.y / this.tileSize);
 
       if (row >= 0 && row < Match3Engine.ROWS && col >= 0 && col < Match3Engine.COLS) {
-        // Manejo de Boosters
+        // Manejo de Boosters (se descuentan únicamente al ejecutarse en el tablero - M3-04)
         if (this.activeBooster === 'hammer') {
-          this.engine.useBoosterHammer(row, col);
+          if (gameState.useMatch3Booster('hammer')) {
+            this.engine.useBoosterHammer(row, col);
+          }
           this.activeBooster = null;
           this.onBoosterChanged?.(null);
           return;
         }
 
         if (this.activeBooster === 'mega_rocklet') {
-          this.engine.useBoosterMegaRocklet(row, col);
+          if (gameState.useMatch3Booster('rocklet')) {
+            this.engine.useBoosterMegaRocklet(row, col);
+          }
           this.activeBooster = null;
           this.onBoosterChanged?.(null);
           return;
@@ -206,7 +220,11 @@ export class Match3Renderer {
             this.firstSwapCell = { row, col };
             this.onBoosterChanged?.('swap');
           } else {
-            this.engine.useBoosterSwap(this.firstSwapCell.row, this.firstSwapCell.col, row, col);
+            if (this.firstSwapCell.row !== row || this.firstSwapCell.col !== col) {
+              if (gameState.useMatch3Booster('swap')) {
+                this.engine.useBoosterSwap(this.firstSwapCell.row, this.firstSwapCell.col, row, col);
+              }
+            }
             this.firstSwapCell = null;
             this.activeBooster = null;
             this.onBoosterChanged?.(null);
@@ -290,6 +308,17 @@ export class Match3Renderer {
 
   private startRenderLoop(): void {
     const loop = (timestamp: number) => {
+      if (this.isPaused) return;
+
+      const settings = gameState.getData().settings;
+      const targetFps = settings?.fps60 ? 60 : 30;
+      const minInterval = (1000 / targetFps) - 2;
+
+      if (this.lastTime && (timestamp - this.lastTime) < minInterval) {
+        this.animId = requestAnimationFrame(loop);
+        return;
+      }
+
       const dt = this.lastTime ? Math.min(0.1, (timestamp - this.lastTime) / 1000) : 0.016;
       this.lastTime = timestamp;
 
@@ -301,9 +330,23 @@ export class Match3Renderer {
     this.animId = requestAnimationFrame(loop);
   }
 
-  public destroy(): void {
+  public pause(): void {
+    if (this.isPaused) return;
+    this.isPaused = true;
     cancelAnimationFrame(this.animId);
+  }
+
+  public resume(): void {
+    if (!this.isPaused) return;
+    this.isPaused = false;
+    this.lastTime = performance.now();
+    this.startRenderLoop();
+  }
+
+  public destroy(): void {
+    this.pause();
     window.removeEventListener('resize', this.onWindowResize);
+    document.removeEventListener('visibilitychange', this.onVisibilityChange);
   }
 
   private updatePhysics(dt: number): void {

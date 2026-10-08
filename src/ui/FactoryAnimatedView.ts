@@ -100,6 +100,14 @@ export class FactoryAnimatedView {
 
   private chimneyTimer: number = 0;
   private isNightMode: boolean = false;
+  private isPaused: boolean = false;
+  private onVisibilityChange = () => {
+    if (document.hidden) {
+      this.pause();
+    } else {
+      this.resume();
+    }
+  };
 
   // Parámetros de ajuste y escalado de imagen
   private imgBounds = { x: 0, y: 0, w: 0, h: 0 };
@@ -158,6 +166,7 @@ export class FactoryAnimatedView {
     this.initListeners();
     this.syncWithState();
     this.resize();
+    document.addEventListener('visibilitychange', this.onVisibilityChange);
     this.startLoop();
   }
 
@@ -452,8 +461,18 @@ export class FactoryAnimatedView {
 
   private startLoop(): void {
     const loop = (time: number) => {
-      if (!this.lastTime) this.lastTime = time;
-      const dt = Math.min((time - this.lastTime) / 1000, 0.1);
+      if (this.isPaused) return;
+
+      const settings = gameState.getData().settings;
+      const targetFps = settings?.fps60 ? 60 : 30;
+      const minInterval = (1000 / targetFps) - 2;
+
+      if (this.lastTime && (time - this.lastTime) < minInterval) {
+        this.animFrameId = requestAnimationFrame(loop);
+        return;
+      }
+
+      const dt = this.lastTime ? Math.min((time - this.lastTime) / 1000, 0.1) : 0.016;
       this.lastTime = time;
       this.animTime += dt;
 
@@ -464,6 +483,27 @@ export class FactoryAnimatedView {
     };
 
     this.animFrameId = requestAnimationFrame(loop);
+  }
+
+  public pause(): void {
+    if (this.isPaused) return;
+    this.isPaused = true;
+    if (this.animFrameId) {
+      cancelAnimationFrame(this.animFrameId);
+      this.animFrameId = null;
+    }
+  }
+
+  public resume(): void {
+    if (!this.isPaused) return;
+    this.isPaused = false;
+    this.lastTime = performance.now();
+    this.startLoop();
+  }
+
+  public destroy(): void {
+    this.pause();
+    document.removeEventListener('visibilitychange', this.onVisibilityChange);
   }
 
   private spawnChimneyPuff(x: number, y: number, isBurst: boolean = false): void {
@@ -487,9 +527,12 @@ export class FactoryAnimatedView {
   }
 
   private update(dt: number): void {
+    const quality = gameState.getData().settings?.quality || 'medium';
+
     // 1. Spawner continuo de humo de chimenea
     this.chimneyTimer += dt;
-    const puffInterval = Math.max(0.18, 0.40 - (this.currentLevel * 0.003));
+    const baseInterval = quality === 'low' ? 0.75 : quality === 'medium' ? 0.42 : 0.32;
+    const puffInterval = Math.max(0.18, baseInterval - (this.currentLevel * 0.003));
     if (this.chimneyTimer >= puffInterval) {
       this.chimneyTimer = 0;
       const chimX = this.imgBounds.x + this.imgBounds.w * 0.738;
@@ -886,11 +929,5 @@ export class FactoryAnimatedView {
     this.ctx.fillStyle = vigGrad;
     this.ctx.fillRect(0, 0, w, h);
     this.ctx.restore();
-  }
-
-  public destroy(): void {
-    if (this.animFrameId !== null) {
-      cancelAnimationFrame(this.animFrameId);
-    }
   }
 }

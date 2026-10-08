@@ -51,7 +51,7 @@ export const SAGA_ZONES: SagaZoneInfo[] = [
     description: 'Don Fulvio Pagani y un grupo de jóvenes pioneros encienden el fuego bajo la primera paila de cobre para crear caramelos duros de miel y menta.',
     accentColor: '#f59e0b',
     bgGradient: 'linear-gradient(180deg, #1f0d04 0%, #351708 30%, #46200c 70%, #30170a 100%)',
-    bgImage: '/saga_zone1_bg.jpg',
+    bgImage: './saga_zone1_bg.jpg',
     milestone: {
       level: 1,
       year: 1951,
@@ -78,7 +78,7 @@ export const SAGA_ZONES: SagaZoneInfo[] = [
     description: 'Arcor cultiva su propia caña de azúcar y monta su primera planta de molienda y glucosa para garantizar materias primas puras.',
     accentColor: '#84cc16',
     bgGradient: 'linear-gradient(180deg, #30170a 0%, #223412 35%, #1b3814 70%, #273010 100%)',
-    bgImage: '/saga_zone2_bg.jpg',
+    bgImage: './saga_zone2_bg.jpg',
     milestone: {
       level: 10,
       year: 1960,
@@ -107,7 +107,7 @@ export const SAGA_ZONES: SagaZoneInfo[] = [
     description: 'Apertura de la emblemática planta de chocolates en Colonia Caroya: nacen las tabletas Cofler, turrones y las primeras coberturas finas.',
     accentColor: '#d97706',
     bgGradient: 'linear-gradient(180deg, #273010 0%, #30180d 35%, #421c0b 70%, #33150d 100%)',
-    bgImage: '/saga_zone3_bg.jpg',
+    bgImage: './saga_zone3_bg.jpg',
     milestone: {
       level: 18,
       year: 1970,
@@ -136,7 +136,7 @@ export const SAGA_ZONES: SagaZoneInfo[] = [
     description: 'En 1984 nace Bon o Bon: oblea crocante, pasta de maní y chocolate. En 1989 nace la tradicional Semana de la Dulzura ("Un Bon o Bon por un beso").',
     accentColor: '#f43f5e',
     bgGradient: 'linear-gradient(180deg, #33150d 0%, #4c1122 35%, #59162c 70%, #3b0f22 100%)',
-    bgImage: '/saga_zone4_bg.jpg',
+    bgImage: './saga_zone4_bg.jpg',
     milestone: {
       level: 28,
       year: 1980,
@@ -165,7 +165,7 @@ export const SAGA_ZONES: SagaZoneInfo[] = [
     description: 'Arcor se asocia con Danone para potenciar Bagley (Criollitas, Opera, Rumba, Chocolinas) e introduce las famosas gomitas Mogul y confites Rocklets.',
     accentColor: '#8b5cf6',
     bgGradient: 'linear-gradient(180deg, #3b0f22 0%, #281442 35%, #1e1550 70%, #171c4c 100%)',
-    bgImage: '/saga_zone5_bg.jpg',
+    bgImage: './saga_zone5_bg.jpg',
     milestone: {
       level: 37,
       year: 1990,
@@ -194,7 +194,7 @@ export const SAGA_ZONES: SagaZoneInfo[] = [
     description: 'Incorporación de La Campagnola, liderazgo en conservas de tomates, mermeladas puras, tambos lecheros y alimentos nutritivos para todos.',
     accentColor: '#ea580c',
     bgGradient: 'linear-gradient(180deg, #171c4c 0%, #331f12 35%, #46260f 70%, #2b1f13 100%)',
-    bgImage: '/saga_zone6_bg.jpg',
+    bgImage: './saga_zone6_bg.jpg',
     milestone: {
       level: 46,
       year: 2000,
@@ -223,7 +223,7 @@ export const SAGA_ZONES: SagaZoneInfo[] = [
     description: 'Lanzamiento de los Helados Arcor, producción de enzimas naturales en Arroyito y un fuerte compromiso con alimentos libres de gluten (Sin TACC).',
     accentColor: '#06b6d4',
     bgGradient: 'linear-gradient(180deg, #2b1f13 0%, #0d2f36 35%, #0b3d39 70%, #092c2e 100%)',
-    bgImage: '/saga_zone7_bg.jpg',
+    bgImage: './saga_zone7_bg.jpg',
     milestone: {
       level: 55,
       year: 2010,
@@ -252,7 +252,7 @@ export const SAGA_ZONES: SagaZoneInfo[] = [
     description: 'Parques eólicos y biomasa abastecen las fábricas; empaques 100% reciclables; exportaciones récord a los 5 continentes.',
     accentColor: '#10b981',
     bgGradient: 'linear-gradient(180deg, #092c2e 0%, #08283d 35%, #092338 70%, #101c2e 100%)',
-    bgImage: '/saga_zone8_bg.jpg',
+    bgImage: './saga_zone8_bg.jpg',
     milestone: {
       level: 63,
       year: 2020,
@@ -281,7 +281,7 @@ export const SAGA_ZONES: SagaZoneInfo[] = [
     description: '¡Festejo final! Gran escenario de gala, trofeo dorado conmemorativo, lluvia de confeti y el agradecimiento a todas las familias que hicieron grande este sueño.',
     accentColor: '#ffd700',
     bgGradient: 'linear-gradient(180deg, #101c2e 0%, #261405 30%, #462200 65%, #241103 100%)',
-    bgImage: '/saga_zone9_bg.jpg',
+    bgImage: './saga_zone9_bg.jpg',
     milestone: {
       level: 75,
       year: 2026,

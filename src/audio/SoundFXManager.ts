@@ -1,3 +1,5 @@
+import { getSharedAudioContext } from './AudioContextHolder.ts';
+
 /**
  * SoundFXManager: Síntesis de audio procedural avanzada mediante Web Audio API.
  * 100% libre de dependencias externas y sin consumo de ancho de banda.
@@ -11,24 +13,35 @@ export class SoundFXManager {
   private isNightAmbient: boolean = false;
   private ambientTimer: any = null;
 
-  constructor() {}
+  constructor() {
+    try {
+      const savedMute = localStorage.getItem('arcor_music_muted');
+      if (savedMute !== null) {
+        this.isMuted = savedMute === 'true';
+      }
+    } catch {
+      this.isMuted = false;
+    }
+  }
 
   private initContext(): void {
-    if (!this.ctx) {
-      const AudioCtxClass = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
-      this.ctx = new AudioCtxClass();
-    }
-    if (this.ctx.state === 'suspended') {
-      this.ctx.resume();
-    }
+    this.ctx = getSharedAudioContext();
   }
 
   public setVolume(vol: number): void {
     this.sfxVolume = Math.max(0, Math.min(1, vol));
   }
 
+  public getVolume(): number {
+    return this.sfxVolume;
+  }
+
   public setMuted(muted: boolean): void {
     this.isMuted = muted;
+  }
+
+  public getIsMuted(): boolean {
+    return this.isMuted;
   }
 
   /**

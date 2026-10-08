@@ -23,6 +23,7 @@ import {
   GiftBox,
   CustomProduct
 } from '../gameplay/CustomizationManager.ts';
+import { escapeHtml, sanitizeSharedGiftBox } from '../core/SecurityUtils.ts';
 import { achievementsManager } from '../gameplay/AchievementsManager.ts';
 import { soundManager } from '../core/SoundManager.ts';
 import { gameState } from '../gameplay/GameState.ts';
@@ -900,14 +901,11 @@ export class GiftBoxBuilderModal {
     const emptyHint = this.element.querySelector('#box-empty-hint') as HTMLElement;
     if (emptyHint) emptyHint.style.display = 'none';
 
-    const candyDef = CATALOG_CANDIES.find(c => c.type === item.type) || {
-      name: item.name,
-      icon: item.icon,
-      bgGradient: 'linear-gradient(135deg, #ec4899, #8b5cf6)',
-      accentColor: '#fef08a',
-      packageKind: 'bonobon' as const,
-      image: undefined
-    };
+    const candyDef = CATALOG_CANDIES.find(c => c.type === item.type);
+    if (!candyDef) {
+      console.warn(`[GiftBoxBuilder] Tipo de golosina no reconocido: ${item.type}`);
+      return;
+    }
 
     const el = document.createElement('div');
     el.className = 'placed-box-item interactive';
@@ -917,12 +915,14 @@ export class GiftBoxBuilderModal {
     el.style.transform = `translate(-50%, -50%) rotate(${item.rotationDeg}deg)`;
     el.style.setProperty('--rot', `${item.rotationDeg}deg`);
 
+    const safeName = escapeHtml(candyDef.name);
+    const safeIcon = escapeHtml(candyDef.icon);
     const hasPhoto = !!candyDef.image;
     const innerHtml = hasPhoto
-      ? `<img src="${candyDef.image}" alt="${candyDef.name}" class="placed-candy-photo" draggable="false" />`
+      ? `<img src="${candyDef.image}" alt="${safeName}" class="placed-candy-photo" draggable="false" />`
       : `<div class="placed-package-3d package-thumb-${candyDef.packageKind}" style="background: ${candyDef.bgGradient}; border: 2px solid ${candyDef.accentColor};">
-          <span class="placed-icon">${candyDef.icon}</span>
-          <span class="placed-label">${candyDef.name}</span>
+          <span class="placed-icon">${safeIcon}</span>
+          <span class="placed-label">${safeName}</span>
           <div class="placed-foil-gleam"></div>
         </div>`;
 
@@ -1300,15 +1300,21 @@ export class GiftBoxBuilderModal {
    * Finalización instantánea para modo accesibilidad (prefers-reduced-motion)
    */
   private finishBoxImmediately(): void {
-    const saved = customizationManager.saveGiftBox({
-      boxDesignId: this.selectedDesign.id,
-      themeId: this.selectedTheme.id,
-      toPerson: this.toPerson,
-      fromPerson: this.fromPerson,
-      dedicationMessage: this.dedicationText,
-      ribbonColor: this.selectedRibbon,
-      placedProducts: [...this.placedItems]
-    });
+    let saved: any;
+    try {
+      saved = customizationManager.saveGiftBox({
+        boxDesignId: this.selectedDesign.id,
+        themeId: this.selectedTheme.id,
+        toPerson: this.toPerson,
+        fromPerson: this.fromPerson,
+        dedicationMessage: this.dedicationText,
+        ribbonColor: this.selectedRibbon,
+        placedProducts: [...this.placedItems]
+      });
+    } catch (err: any) {
+      alert(err?.message || 'Error: no se pudo guardar la caja de regalo.');
+      return;
+    }
 
     this.lastSavedBox = saved;
     achievementsManager.checkAll();
@@ -1513,15 +1519,21 @@ export class GiftBoxBuilderModal {
    */
   private transitionToFinalCeremonyView(): void {
     // 1. Guardar caja en el gestor y almacenamiento local
-    const saved = customizationManager.saveGiftBox({
-      boxDesignId: this.selectedDesign.id,
-      themeId: this.selectedTheme.id,
-      toPerson: this.toPerson,
-      fromPerson: this.fromPerson,
-      dedicationMessage: this.dedicationText,
-      ribbonColor: this.selectedRibbon,
-      placedProducts: [...this.placedItems]
-    });
+    let saved: any;
+    try {
+      saved = customizationManager.saveGiftBox({
+        boxDesignId: this.selectedDesign.id,
+        themeId: this.selectedTheme.id,
+        toPerson: this.toPerson,
+        fromPerson: this.fromPerson,
+        dedicationMessage: this.dedicationText,
+        ribbonColor: this.selectedRibbon,
+        placedProducts: [...this.placedItems]
+      });
+    } catch (err: any) {
+      alert(err?.message || 'Error: no se pudo guardar la caja de regalo.');
+      return;
+    }
 
     this.lastSavedBox = saved;
     achievementsManager.checkAll();
@@ -1775,28 +1787,41 @@ export class GiftBoxBuilderModal {
    * Muestra una caja obsequio recibida mediante enlace compartido
    */
   public showSharedBox(shared: any): void {
+    const valid = sanitizeSharedGiftBox(shared) || {
+      t: 'Alguien Muy Especial',
+      f: 'Yo',
+      m: 'Un mundo más dulce para vos ♡',
+      r: 'dorado',
+      d: 'dorada_lujo',
+      th: 'aniversario',
+      p: []
+    };
+
     this.resetBuilder();
 
-    this.toPerson = shared.t || 'Alguien Muy Especial';
-    this.fromPerson = shared.f || 'Yo';
-    this.dedicationText = shared.m || 'Un mundo más dulce para vos ♡';
-    this.selectedRibbon = shared.r || 'dorado';
+    this.toPerson = valid.t;
+    this.fromPerson = valid.f;
+    this.dedicationText = valid.m;
+    this.selectedRibbon = valid.r as RibbonColor;
 
-    const design = BOX_DESIGNS_CATALOG.find(d => d.id === shared.d) || BOX_DESIGNS_CATALOG[0];
+    const design = BOX_DESIGNS_CATALOG.find(d => d.id === valid.d) || BOX_DESIGNS_CATALOG[0];
     this.selectedDesign = design;
 
-    const theme = BOX_THEMES_CATALOG.find(t => t.id === shared.th) || BOX_THEMES_CATALOG[0];
+    const theme = BOX_THEMES_CATALOG.find(t => t.id === valid.th) || BOX_THEMES_CATALOG[0];
     this.selectedTheme = theme;
 
-    this.placedItems = (shared.p || []).map((p: any) => ({
-      id: `item_${Date.now()}_${Math.random().toString(36).substr(2, 4)}`,
-      type: p.t,
-      name: p.n,
-      icon: p.i,
-      xPercent: p.x,
-      yPercent: p.y,
-      rotationDeg: p.r
-    }));
+    this.placedItems = valid.p.map((p, idx) => {
+      const def = CATALOG_CANDIES.find(c => c.type === p.type) || CATALOG_CANDIES[0];
+      return {
+        id: `item_${Date.now()}_${idx}`,
+        type: def.type,
+        name: def.name,
+        icon: def.icon,
+        xPercent: p.x,
+        yPercent: p.y,
+        rotationDeg: p.r
+      };
+    });
 
     if (this.builderViewEl) this.builderViewEl.style.display = 'none';
     if (this.closedBoxViewEl) this.closedBoxViewEl.style.display = 'flex';

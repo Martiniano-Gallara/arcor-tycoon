@@ -1,9 +1,11 @@
-import { SaveManager, GameSaveData, DEFAULT_SAVE_DATA, PlacedBuildingSave, WorkerSaveData } from '../core/SaveManager.ts';
+import { SaveManager, GameSaveData, createDefaultSaveData, PlacedBuildingSave, WorkerSaveData } from '../core/SaveManager.ts';
 import { ERAS_DEFINITION, EraDefinition, HistoricalEvent } from './historyEras.ts';
 import { QuestManager } from './QuestManager.ts';
 import { LogisticsSystem, DeliveryContract } from './LogisticsSystem.ts';
 import { soundManager } from '../core/SoundManager.ts';
 import { proceduralMusic } from '../audio/ProceduralMusic.ts';
+import { achievementsManager } from './AchievementsManager.ts';
+import { customizationManager } from './CustomizationManager.ts';
 
 export type StateListener = (state: GameSaveData) => void;
 
@@ -25,10 +27,28 @@ export class GameState {
   public logisticsSystem: LogisticsSystem;
 
   private passiveIncomeTimer: number = 0;
+  private saveDebounceTimer: any = null;
   public onFactoryProduced?: (building: PlacedBuildingSave, productKey: string, amount: number) => void;
 
   constructor() {
     this.data = SaveManager.load();
+
+    // Sincronización multi-pestaña en tiempo real (PER-01)
+    SaveManager.onExternalChange((incoming) => {
+      if ((incoming.savedAt || 0) > (this.data.savedAt || 0)) {
+        this.data = incoming;
+        this.listeners.forEach(cb => cb(this.data));
+      }
+    });
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('beforeunload', () => this.flushSave());
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'hidden') {
+          this.flushSave();
+        }
+      });
+    }
 
     // Asegurar 2.500 USD por defecto para iniciar con buen impulso
     if (!this.data.hasReceivedDefault2500USD) {
@@ -84,10 +104,30 @@ export class GameState {
     return () => this.listeners.delete(listener);
   }
 
-  public notify(): void {
+  public flushSave(): void {
+    if (this.saveDebounceTimer) {
+      clearTimeout(this.saveDebounceTimer);
+      this.saveDebounceTimer = null;
+    }
     this.data.lastActiveTimestamp = Date.now();
     SaveManager.save(this.data);
+  }
+
+  public notify(options?: { immediate?: boolean }): void {
+    this.data.lastActiveTimestamp = Date.now();
+    // Siempre notificamos la UI de memoria de inmediato
     this.listeners.forEach(cb => cb(this.data));
+
+    if (options?.immediate) {
+      this.flushSave();
+    } else {
+      // Debounce para escrituras de disco en localStorage (PERF-01 / PER-01)
+      if (!this.saveDebounceTimer) {
+        this.saveDebounceTimer = setTimeout(() => {
+          this.flushSave();
+        }, 4000);
+      }
+    }
   }
 
   public advanceMonth(): void {
@@ -146,18 +186,30 @@ export class GameState {
     return { success: true, message: 'Tus ingresos se generan pasivamente por segundo.' };
   }
 
+  public spend(amount: number): boolean {
+    if (amount <= 0) return true;
+    if (!Number.isFinite(amount)) return false;
+    if ((this.data.money || 0) < amount) return false;
+    this.data.money = Math.max(0, (this.data.money || 0) - amount);
+    this.notify();
+    return true;
+  }
+
   public addMoney(amount: number): void {
-    this.data.money += amount;
+    if (!Number.isFinite(amount) || amount <= 0) return;
+    const MAX_MONEY = 1e12;
+    this.data.money = Math.min(MAX_MONEY, (this.data.money || 0) + amount);
     this.notify();
   }
 
   // =========================================================================
-  // INGRESOS PASIVOS CONTINUOS DE LA FÁBRICA
+  // INGRESOS PASIVOS CONTINUOS DE LA FÁBRICA (ECO-03 UNIFICADO)
   // =========================================================================
   public getIdleIncomePerSecond(): number {
-    const levelBonus = (this.data.match3CurrentLevel || 1) * 12;
-    const yearBonus = Math.max(0, (this.data.currentYear || 1951) - 1951) * 5;
-    return 25 + levelBonus + yearBonus;
+    const levelBonus = (this.data.match3CurrentLevel || 1) * 2;
+    const buildingsCount = (this.data.buildings && this.data.buildings.length) || 1;
+    const buildingBonus = buildingsCount * 5;
+    return 15 + levelBonus + buildingBonus;
   }
 
   public tick(delta: number, _speedMult: number = 1.0): void {
@@ -167,8 +219,7 @@ export class GameState {
       this.passiveIncomeTimer -= seconds;
 
       const rate = this.getIdleIncomePerSecond();
-      this.data.money += rate * seconds;
-      this.notify();
+      this.addMoney(rate * seconds);
     }
   }
 
@@ -180,18 +231,28 @@ export class GameState {
   } | null {
     const now = Date.now();
     const last = this.data.lastActiveTimestamp || now;
-    this.data.lastActiveTimestamp = now;
-    SaveManager.save(this.data);
+
+    // Protección anti-trampa de reloj hacia atrás (TIME-01)
+    if (now < last) {
+      this.data.lastActiveTimestamp = now;
+      this.flushSave();
+      return null;
+    }
 
     const diffSeconds = Math.floor((now - last) / 1000);
-    if (diffSeconds < 30) return null;
+    if (diffSeconds < 30) {
+      this.data.lastActiveTimestamp = now;
+      return null;
+    }
 
-    const effectiveSeconds = Math.min(diffSeconds, 36000); // 10 hrs max
+    // Tope máximo de 8 horas offline (28800 segundos)
+    const effectiveSeconds = Math.min(diffSeconds, 28800);
     const rate = this.getIdleIncomePerSecond();
-    const earnedMoney = Math.floor(rate * effectiveSeconds * 0.7); // 70% offline efficiency
+    const earnedMoney = Math.floor(rate * effectiveSeconds * 0.7); // 70% de eficiencia sobre la tasa unificada
 
-    this.data.money += earnedMoney;
-    this.notify();
+    this.data.lastActiveTimestamp = now;
+    this.addMoney(earnedMoney);
+    this.flushSave();
 
     return {
       offlineSeconds: effectiveSeconds,
@@ -204,14 +265,17 @@ export class GameState {
   public unlockCard(cardId: string): void {
     if (!this.data.unlockedCards.includes(cardId)) {
       this.data.unlockedCards.push(cardId);
-      this.notify();
+      this.notify({ immediate: true });
     }
   }
 
   public resetGame(): void {
-    this.data = JSON.parse(JSON.stringify(DEFAULT_SAVE_DATA));
+    this.data = createDefaultSaveData();
+    SaveManager.reset();
+    achievementsManager.reset();
+    customizationManager.reset();
     SaveManager.save(this.data);
-    this.notify();
+    this.notify({ immediate: true });
   }
 
   public updateSettings(settings: Partial<GameSaveData['settings']>): void {
@@ -229,10 +293,11 @@ export class GameState {
   // PROGRESIÓN VINCULADA: ARCOR CRUSH ➔ HITOS HISTÓRICOS ➔ CONSTRUCCIÓN
   // =========================================================================
   public setMatch3Level(level: number): void {
-    this.data.match3CurrentLevel = level;
-    const year = LEVEL_YEARS[level] || 1951;
+    const capped = Math.max(1, Math.min(75, level));
+    this.data.match3CurrentLevel = capped;
+    const year = LEVEL_YEARS[capped] || 1951;
     this.data.currentYear = Math.max(this.data.currentYear || 1951, year);
-    this.notify();
+    this.notify({ immediate: true });
   }
 
   public addMatch3Stars(amount: number): void {

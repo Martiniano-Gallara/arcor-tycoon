@@ -376,7 +376,9 @@ export class ArcorQuizModal {
 
     if (result.isCorrect) {
       soundManager.playFanfare();
-      this.spawnFloatingHeartFeedback();
+      if (result.livesAwarded > 0) {
+        this.spawnFloatingHeartFeedback();
+      }
       this.updateLivesHeader();
     } else {
       soundManager.playLose();
@@ -384,7 +386,13 @@ export class ArcorQuizModal {
 
     // Mostrar tarjeta informativa histórica
     if (this.explanationCardEl && this.explanationTextEl) {
-      this.explanationTextEl.textContent = result.explanation;
+      let extra = '';
+      if (result.isCorrect && result.livesAwarded === 0) {
+        extra = progressionState.getLives() >= 5
+          ? ' • (Vidas al máximo: 5/5)'
+          : ' • (Límite diario de 5 vidas alcanzado)';
+      }
+      this.explanationTextEl.textContent = `${result.explanation}${extra}`;
       this.explanationCardEl.style.display = 'block';
       this.explanationCardEl.classList.add('card-animate-in');
     }

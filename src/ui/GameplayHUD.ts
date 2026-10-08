@@ -366,9 +366,6 @@ export class GameplayHUD {
             <div class="lives-rules-info">
               <span>Recuperas 1 ❤️ automáticamente cada 20 minutos de juego.</span>
             </div>
-            <button class="btn btn-primary btn-refill-lives-now interactive" id="btn-refill-lives">
-              Recargar Vidas al Máximo (5 ❤️)
-            </button>
             <button class="btn btn-secondary btn-quiz-lives interactive" id="btn-quiz-lives" style="margin-top: 10px; width: 100%;">
               <span>💡 Jugar Trivia Arcor (+Vidas)</span>
             </button>
@@ -615,13 +612,6 @@ export class GameplayHUD {
     hud.querySelector('#btn-lives-close')?.addEventListener('click', () => {
       soundManager.playClick();
       this.closeLivesModal();
-    });
-
-    hud.querySelector('#btn-refill-lives')?.addEventListener('click', () => {
-      soundManager.playClick();
-      progressionState.refillLives();
-      this.updateProgressionInfo();
-      this.showToast('¡Vidas recargadas al máximo (5 ❤️)!');
     });
 
     hud.querySelector('#btn-quiz-lives')?.addEventListener('click', () => {
@@ -960,6 +950,7 @@ export class GameplayHUD {
 
   public show(): void {
     this.element.classList.add('active');
+    this.factoryView.resume();
     this.factoryView.resize();
     this.factoryView.syncWithState();
     this.updateState(gameState.getData());
@@ -968,6 +959,26 @@ export class GameplayHUD {
 
   public hide(): void {
     this.element.classList.remove('active');
+    this.factoryView.pause();
+  }
+
+  public updateDayNightCycle(): void {
+    const progress = timeManager.getDayProgress();
+    const totalMinutes = Math.floor(progress * 1440);
+    const hh = Math.floor(totalMinutes / 60);
+    const mm = totalMinutes % 60;
+    const formatted = `${String(hh).padStart(2, '0')}:${String(mm).padStart(2, '0')}`;
+
+    let icon = '☀️';
+    if (hh >= 6 && hh < 18) {
+      icon = '☀️';
+    } else if (hh >= 18 && hh < 21) {
+      icon = '🌅';
+    } else {
+      icon = '🌙';
+    }
+
+    this.updateDayNight(formatted, icon);
   }
 
   public updateDayNight(formattedTime: string, emoji: string): void {

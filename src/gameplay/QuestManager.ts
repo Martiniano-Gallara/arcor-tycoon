@@ -70,6 +70,9 @@ export class QuestManager {
       || this.allEvents.find(e => Math.abs(e.year - targetYear) <= 2);
 
     if (event) {
+      if (this.completedEventIds.has(event.id)) {
+        return null;
+      }
       this.completedEventIds.add(event.id);
       gameState.addCompletedQuest(event.id);
       this.onEventCompletedListeners.forEach(cb => cb(event));

@@ -325,8 +325,6 @@ export class SagaMapEngine {
       soundManager.playClick();
       if (this.onOpenQuizRequested) {
         this.onOpenQuizRequested();
-      } else {
-        progressionState.refillLives();
       }
     };
     this.element.querySelector('#saga-btn-add-lives')?.addEventListener('click', addLives);
@@ -413,8 +411,6 @@ export class SagaMapEngine {
       if (lives <= 0) {
         if (this.onOpenQuizRequested) {
           this.onOpenQuizRequested();
-        } else {
-          progressionState.refillLives();
         }
         return;
       }
@@ -577,8 +573,6 @@ export class SagaMapEngine {
         if (lives <= 0) {
           if (this.onOpenQuizRequested) {
             this.onOpenQuizRequested();
-          } else {
-            progressionState.refillLives();
           }
           return;
         }

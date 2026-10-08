@@ -23,6 +23,7 @@ import { ArcorQuizModal } from './ArcorQuizModal.ts';
 import { ProductCreatorModal } from './ProductCreatorModal.ts';
 import { GiftBoxBuilderModal } from './GiftBoxBuilderModal.ts';
 import { MyCollectionModal } from './MyCollectionModal.ts';
+import { sanitizeSharedGiftBox } from '../core/SecurityUtils.ts';
 import { achievementsManager } from '../gameplay/AchievementsManager.ts';
 
 export class UIManager {
@@ -456,6 +457,7 @@ export class UIManager {
 
   public update(_delta: number): void {
     this.gameplayHUD.updateIdleRate(this.metaBridge.getIdleRatePerSecond());
+    this.gameplayHUD.updateDayNightCycle();
   }
 
   /**
@@ -467,17 +469,22 @@ export class UIManager {
       if (hash && (hash.startsWith('#box=') || hash.startsWith('#giftbox='))) {
         try {
           const rawB64 = decodeURIComponent(hash.replace(/^#(box|giftbox)=/, ''));
+          if (rawB64.length > 4096) {
+            console.warn('[UIManager] Payload de caja compartida excede longitud permitida');
+            return;
+          }
           const binary = atob(rawB64);
           const bytes = new Uint8Array(binary.length);
           for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
           const jsonStr = new TextDecoder().decode(bytes);
-          const sharedData = JSON.parse(jsonStr);
-          if (sharedData) {
+          const rawData = JSON.parse(jsonStr);
+          const sanitized = sanitizeSharedGiftBox(rawData);
+          if (sanitized) {
             this.titleScreen.element.style.display = 'none';
             this.sagaMapEngine.hide();
             this.gameplayHUD.show();
             this.openGiftBoxBuilder('gameplay');
-            this.giftBoxBuilderModal.showSharedBox(sharedData);
+            this.giftBoxBuilderModal.showSharedBox(sanitized);
           }
         } catch (err) {
           console.warn('Error al decodificar regalo compartido desde hash:', err);

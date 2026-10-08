@@ -437,7 +437,12 @@ export class CustomizationManager {
     return [...this.customProducts];
   }
 
+  public static readonly MAX_SAVED_ITEMS = 50;
+
   public saveCustomProduct(product: Omit<CustomProduct, 'id' | 'createdAt'>): CustomProduct {
+    if (this.customProducts.length >= CustomizationManager.MAX_SAVED_ITEMS) {
+      throw new Error(`Límite alcanzado: máximo ${CustomizationManager.MAX_SAVED_ITEMS} golosinas personalizadas.`);
+    }
     const fullProduct: CustomProduct = {
       ...product,
       id: `prod_${Date.now()}_${Math.floor(Math.random() * 1000)}`,
@@ -462,6 +467,9 @@ export class CustomizationManager {
   }
 
   public saveGiftBox(box: Omit<GiftBox, 'id' | 'createdAt'>): GiftBox {
+    if (this.giftBoxes.length >= CustomizationManager.MAX_SAVED_ITEMS) {
+      throw new Error(`Límite alcanzado: máximo ${CustomizationManager.MAX_SAVED_ITEMS} cajas de regalo.`);
+    }
     const fullBox: GiftBox = {
       ...box,
       id: `box_${Date.now()}_${Math.floor(Math.random() * 1000)}`,
@@ -474,6 +482,12 @@ export class CustomizationManager {
 
   public deleteGiftBox(id: string): void {
     this.giftBoxes = this.giftBoxes.filter(b => b.id !== id);
+    this.saveToStorage();
+  }
+
+  public reset(): void {
+    this.customProducts = [];
+    this.giftBoxes = [];
     this.saveToStorage();
   }
 
@@ -557,35 +571,54 @@ export class CustomizationManager {
   public getCollectionStatistics(): {
     totalItems: number;
     unlockedItems: number;
+    unlockedByProgressionItems: number;
     percentage: number;
     customProductsCreated: number;
     giftBoxesCreated: number;
   } {
     let total = 0;
     let unlocked = 0;
+    let unlockedByProgression = 0;
 
     // Packagings
     for (const key in PACKAGING_TYPES_INFO) {
       total++;
-      if (this.isPackagingUnlocked(key as PackagingType).isUnlocked) unlocked++;
+      const info = PACKAGING_TYPES_INFO[key as PackagingType];
+      const isUn = this.isPackagingUnlocked(key as PackagingType).isUnlocked;
+      if (isUn) {
+        unlocked++;
+        if (!info.unlockedByDefault) unlockedByProgression++;
+      }
     }
 
     // Colores
     for (const color of COLOR_THEMES_CATALOG) {
       total++;
-      if (this.isColorThemeUnlocked(color).isUnlocked) unlocked++;
+      const isUn = this.isColorThemeUnlocked(color).isUnlocked;
+      if (isUn) {
+        unlocked++;
+        if (!color.unlockedByDefault) unlockedByProgression++;
+      }
     }
 
     // Stickers
     for (const st of STICKERS_CATALOG) {
       total++;
-      if (this.isStickerUnlocked(st).isUnlocked) unlocked++;
+      const isUn = this.isStickerUnlocked(st).isUnlocked;
+      if (isUn) {
+        unlocked++;
+        if (!st.unlockedByDefault) unlockedByProgression++;
+      }
     }
 
     // Cajas
     for (const box of BOX_DESIGNS_CATALOG) {
       total++;
-      if (this.isBoxDesignUnlocked(box).isUnlocked) unlocked++;
+      const isUn = this.isBoxDesignUnlocked(box).isUnlocked;
+      if (isUn) {
+        unlocked++;
+        if (!box.unlockedByDefault) unlockedByProgression++;
+      }
     }
 
     const percentage = total > 0 ? Math.round((unlocked / total) * 100) : 0;
@@ -593,6 +626,7 @@ export class CustomizationManager {
     return {
       totalItems: total,
       unlockedItems: unlocked,
+      unlockedByProgressionItems: unlockedByProgression,
       percentage,
       customProductsCreated: this.customProducts.length,
       giftBoxesCreated: this.giftBoxes.length

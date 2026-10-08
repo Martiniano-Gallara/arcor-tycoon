@@ -200,6 +200,18 @@ export class AchievementsManager {
     }
   }
 
+  public reset(): void {
+    this.progressMap = {};
+    ACHIEVEMENTS_CATALOG.forEach(ach => {
+      this.progressMap[ach.id] = {
+        unlocked: false,
+        claimed: false,
+        currentProgress: 0
+      };
+    });
+    this.save();
+  }
+
   public onAchievementUnlocked(cb: (ach: AchievementDef) => void): () => void {
     this.onUnlockedListeners.add(cb);
     return () => this.onUnlockedListeners.delete(cb);
@@ -261,13 +273,14 @@ export class AchievementsManager {
     this.reportProgress('ach_first_box', boxesCount >= 1 ? 1 : 0);
     this.reportProgress('ach_three_boxes', Math.min(3, boxesCount));
 
-    // 4. Colección
-    this.reportProgress('ach_five_unlocks', Math.min(5, stats.unlockedItems));
+    // 4. Colección: solo contar elementos desbloqueados mediante logros o progresión (LOGR-01)
+    this.reportProgress('ach_five_unlocks', Math.min(5, stats.unlockedByProgressionItems));
     this.reportProgress('ach_collection_master', stats.percentage);
 
-    // 5. Vidas
+    // 5. Vidas: requiere que el jugador haya comenzado a jugar activamente (LOGR-01)
+    const hasPlayed = (data.match3CurrentLevel || 1) > 1 || (data.match3Stars || 0) > 0 || (data.completedQuests && data.completedQuests.length > 0);
     const lives = data.lives ?? 5;
-    if (lives >= 5) {
+    if (hasPlayed && lives >= 5) {
       this.reportProgress('ach_full_lives', 5);
     }
   }

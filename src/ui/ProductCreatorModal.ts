@@ -20,6 +20,7 @@ import {
 import { achievementsManager } from '../gameplay/AchievementsManager.ts';
 import { soundManager } from '../core/SoundManager.ts';
 import { gameState } from '../gameplay/GameState.ts';
+import { escapeHtml } from '../core/SecurityUtils.ts';
 
 const PACKAGING_ORDER: PackagingType[] = [
   'tubo_confites',
@@ -63,6 +64,9 @@ export class ProductCreatorModal {
   constructor() {
     this.element = this.render();
     this.updateLivePreview();
+    gameState.subscribe(() => {
+      this.updateCoinsDisplay();
+    });
   }
 
   private render(): HTMLElement {
@@ -114,7 +118,7 @@ export class ProductCreatorModal {
           <!-- Monedas -->
           <div class="taller-coins-pill">
             <span class="coin-symbol">🪙</span>
-            <span class="coin-val" id="taller-coins-display">$${(gameState.getData().money || 218577).toLocaleString('es-AR')}</span>
+            <span class="coin-val" id="taller-coins-display">$${(gameState.getData().money || 0).toLocaleString('es-AR')}</span>
           </div>
         </header>
 
@@ -670,17 +674,22 @@ export class ProductCreatorModal {
   }
 
   private handleFinishProduct(): void {
+    let saved: any;
+    try {
+      saved = customizationManager.saveCustomProduct({
+        brand: this.selectedBrand,
+        packaging: this.selectedPackaging,
+        name: this.productName,
+        flavorOrMessage: this.productFlavor,
+        colorThemeId: this.selectedColorThemeId,
+        selectedStickers: Array.from(this.selectedStickers)
+      });
+    } catch (err: any) {
+      alert(err?.message || 'Error: no se pudo guardar la golosina.');
+      return;
+    }
+
     soundManager.playFanfare();
-
-    const saved = customizationManager.saveCustomProduct({
-      brand: this.selectedBrand,
-      packaging: this.selectedPackaging,
-      name: this.productName,
-      flavorOrMessage: this.productFlavor,
-      colorThemeId: this.selectedColorThemeId,
-      selectedStickers: Array.from(this.selectedStickers)
-    });
-
     achievementsManager.checkAll();
 
     if (this.readyProductCardEl) {
@@ -689,10 +698,10 @@ export class ProductCreatorModal {
       this.readyProductCardEl.innerHTML = `
         <div class="ready-product-item" style="background: linear-gradient(145deg, ${theme.primary} 0%, ${theme.secondary} 100%); border: 2px solid ${theme.accent};">
           <div class="ready-brand-tag" style="color: ${theme.accent};">ARCOR</div>
-          <h3 class="ready-item-name" style="color: #ffffff;">${saved.name}</h3>
-          <p class="ready-item-flavor">${saved.flavorOrMessage}</p>
+          <h3 class="ready-item-name" style="color: #ffffff;">${escapeHtml(saved.name)}</h3>
+          <p class="ready-item-flavor">${escapeHtml(saved.flavorOrMessage)}</p>
           <div class="ready-item-stickers">
-            ${saved.selectedStickers.map(stId => {
+            ${saved.selectedStickers.map((stId: string) => {
               const s = STICKERS_CATALOG.find(x => x.id === stId);
               return s ? `<span class="mini-sticker">${s.icon} ${s.label}</span>` : '';
             }).join('')}
@@ -719,13 +728,17 @@ export class ProductCreatorModal {
     this.updateLivePreview();
   }
 
-  public show(): void {
-    this.resetToEditor();
-    const money = gameState.getData().money;
+  public updateCoinsDisplay(): void {
     const coinsDisplay = this.element.querySelector('#taller-coins-display');
     if (coinsDisplay) {
-      coinsDisplay.textContent = `$${(money && money >= 100000 ? money : 218577).toLocaleString('es-AR')}`;
+      const money = gameState.getData().money || 0;
+      coinsDisplay.textContent = `$${money.toLocaleString('es-AR')}`;
     }
+  }
+
+  public show(): void {
+    this.resetToEditor();
+    this.updateCoinsDisplay();
     this.element.style.display = 'flex';
   }
 

@@ -39,6 +39,7 @@ export class Match3HUD {
   private unlockCanvas: HTMLCanvasElement | null = null;
   private unlockAnimId: number | null = null;
   private seenUnlocks: Set<string> = new Set();
+  private toastTimer: any = null;
 
   public onClose?: () => void;
   public onOpenQuizRequested?: () => void;
@@ -64,6 +65,10 @@ export class Match3HUD {
           if (sub) sub.textContent = '(Gasta 1 Vida)';
         }
       }
+    });
+
+    gameState.subscribe(() => {
+      this.updateBoostersDisplay();
     });
   }
 
@@ -336,9 +341,9 @@ export class Match3HUD {
               <span class="btn-retry-sub">(Gasta 1 Vida)</span>
             </button>
 
-            <button class="btn-extra-moves interactive" id="btn-lose-extra-moves" title="+5 Movimientos para ganar">
+            <button class="btn-extra-moves interactive" id="btn-lose-extra-moves" title="+5 Movimientos para ganar ($300)">
               <span class="extra-icon">✨</span>
-              <span class="extra-text">+5 Movimientos Extra</span>
+              <span class="extra-text">+5 Movimientos ($300)</span>
             </button>
 
             <button class="btn btn-secondary interactive" id="btn-lose-exit">
@@ -414,9 +419,8 @@ export class Match3HUD {
       if (lives <= 0) {
         if (this.onOpenQuizRequested) {
           this.onOpenQuizRequested();
-          return;
         }
-        progressionState.refillLives();
+        return;
       }
       this.hideLoseModal();
       progressionState.useLife();
@@ -425,9 +429,28 @@ export class Match3HUD {
     });
 
     root.querySelector('#btn-lose-extra-moves')?.addEventListener('click', () => {
-      soundManager.playFanfare();
-      this.hideLoseModal();
-      this.engine.addExtraMoves(5);
+      const EXTRA_MOVES_COST = 300;
+      if (!this.engine.canAddExtraMoves()) {
+        soundManager.playClick();
+        this.showToast('¡Límite alcanzado! Solo se permite 1 continuación por partida.');
+        return;
+      }
+      const currentMoney = gameState.getData().money || 0;
+      if (currentMoney < EXTRA_MOVES_COST) {
+        soundManager.playClick();
+        this.showToast(`Fondos insuficientes: necesitas $${EXTRA_MOVES_COST} para continuar.`);
+        return;
+      }
+
+      const spent = gameState.spend(EXTRA_MOVES_COST);
+      if (spent) {
+        soundManager.playFanfare();
+        const success = this.engine.addExtraMoves(5);
+        if (success) {
+          this.hideLoseModal();
+          this.showToast('¡+5 Movimientos añadidos!');
+        }
+      }
     });
 
     root.querySelector('#btn-lose-exit')?.addEventListener('click', () => {
@@ -441,36 +464,24 @@ export class Match3HUD {
       this.hideProductUnlock();
     });
 
-    // Listeners de Boosters con activación, cancelación y reembolso
+    // Listeners de Boosters con armado y cancelación (M3-04: no se gasta inventario por adelantado)
     const toggleBooster = (type: 'hammer' | 'mega_rocklet' | 'swap', prop: 'hammer' | 'rocklet' | 'swap') => {
       if (!this.renderer) return;
-      const data = gameState.getData() as any;
-      if (!data.match3Boosters) {
-        data.match3Boosters = { hammer: 3, rocklet: 3, swap: 3 };
-      }
+      const data = gameState.getData();
 
-      // Si ya está activo este mismo booster, lo cancela y reembolsa
+      // Si ya está activo este mismo booster, lo desactiva
       if (this.renderer.activeBooster === type) {
         soundManager.playClick();
         this.renderer.activeBooster = null;
-        data.match3Boosters[prop]++;
         this.updateBoostersDisplay();
         return;
       }
 
-      // Si había otro booster activo, reembolsar ese primero
-      if (this.renderer.activeBooster) {
-        if (this.renderer.activeBooster === 'hammer') data.match3Boosters.hammer++;
-        else if (this.renderer.activeBooster === 'mega_rocklet') data.match3Boosters.rocklet++;
-        else if (this.renderer.activeBooster === 'swap') data.match3Boosters.swap++;
-        this.renderer.activeBooster = null;
-      }
-
-      // Verificar si quedan existencias
-      if ((data.match3Boosters[prop] || 0) > 0) {
+      // Desactivar cualquier previo y comprobar existencias antes de armar
+      const available = data.match3Boosters?.[prop] || 0;
+      if (available > 0) {
         soundManager.playCoin();
         this.renderer.activeBooster = type;
-        data.match3Boosters[prop]--;
         this.updateBoostersDisplay();
       } else {
         soundManager.playClick();
@@ -577,9 +588,12 @@ export class Match3HUD {
       if (this.canvas) {
         this.renderer = new Match3Renderer(this.canvas, this.engine);
         this.renderer.onBoosterChanged = () => {
-          this.updateBoosterActiveStates();
+          this.updateBoostersDisplay();
         };
       }
+    } else {
+      this.renderer.activeBooster = null;
+      this.renderer.resume();
     }
 
     const cfg = this.bridge.getLevelConfig(lvl);
@@ -614,6 +628,10 @@ export class Match3HUD {
   }
 
   public hide(): void {
+    if (this.renderer) {
+      this.renderer.activeBooster = null;
+      this.renderer.pause();
+    }
     this.hideProductUnlock();
     this.hideLoseModal();
     this.element.style.display = 'none';
@@ -682,6 +700,19 @@ export class Match3HUD {
       const sub = retryBtn?.querySelector('.btn-retry-sub');
       if (sub) sub.textContent = '(Gasta 1 Vida)';
     }
+
+    const extraMovesBtn = this.loseModal.querySelector<HTMLButtonElement>('#btn-lose-extra-moves');
+    if (extraMovesBtn) {
+      if (!this.engine.canAddExtraMoves()) {
+        extraMovesBtn.style.opacity = '0.5';
+        extraMovesBtn.style.pointerEvents = 'none';
+        extraMovesBtn.title = 'Ya has utilizado la extensión en esta partida';
+      } else {
+        extraMovesBtn.style.opacity = '1';
+        extraMovesBtn.style.pointerEvents = 'auto';
+        extraMovesBtn.title = '+5 Movimientos para ganar ($300)';
+      }
+    }
   }
 
   private hideLoseModal(): void {
@@ -689,6 +720,24 @@ export class Match3HUD {
     if (this.loseModal) {
       this.loseModal.style.display = 'none';
     }
+  }
+
+  public showToast(message: string): void {
+    let toast = this.element.querySelector('.m3-toast') as HTMLElement;
+    if (!toast) {
+      toast = document.createElement('div');
+      toast.className = 'm3-toast toast-notification';
+      toast.style.cssText = 'position: absolute; top: 15%; left: 50%; transform: translate(-50%, -20px); background: #0f172af2; border: 1.5px solid #d4af37; color: #ffe28a; padding: 10px 20px; border-radius: 28px; font-weight: 700; font-size: 0.9rem; z-index: 9999; pointer-events: none; transition: all 0.3s ease; box-shadow: 0 10px 30px rgba(0,0,0,0.8); opacity: 0;';
+      this.element.appendChild(toast);
+    }
+    toast.textContent = message;
+    toast.style.opacity = '1';
+    toast.style.transform = 'translate(-50%, 0)';
+    clearTimeout(this.toastTimer);
+    this.toastTimer = setTimeout(() => {
+      toast.style.opacity = '0';
+      toast.style.transform = 'translate(-50%, -20px)';
+    }, 2500);
   }
 
   /**

@@ -21,6 +21,7 @@ import {
 } from '../gameplay/CustomizationManager.ts';
 import { achievementsManager, ACHIEVEMENTS_CATALOG } from '../gameplay/AchievementsManager.ts';
 import { soundManager } from '../core/SoundManager.ts';
+import { escapeHtml } from '../core/SecurityUtils.ts';
 
 export class MyCollectionModal {
   public element: HTMLElement;
@@ -224,8 +225,8 @@ export class MyCollectionModal {
             <span class="c-pkg-badge">${pkg.icon} ${pkg.name}</span>
           </div>
 
-          <h4 class="c-prod-title" style="color: ${theme.text}">${prod.name}</h4>
-          <p class="c-prod-flavor">${prod.flavorOrMessage}</p>
+          <h4 class="c-prod-title" style="color: ${theme.text}">${escapeHtml(prod.name)}</h4>
+          <p class="c-prod-flavor">${escapeHtml(prod.flavorOrMessage)}</p>
 
           <div class="c-stickers-row">
             ${prod.selectedStickers.map(stId => {
@@ -315,13 +316,13 @@ export class MyCollectionModal {
 
           <div class="box-card-details">
             <span class="box-card-design-tag">${design.name}</span>
-            <h4 class="box-card-to">Para: ${box.toPerson}</h4>
-            <p class="box-card-msg">"${box.dedicationMessage}"</p>
-            <span class="box-card-from">De: ${box.fromPerson} ♡</span>
+            <h4 class="box-card-to">Para: ${escapeHtml(box.toPerson)}</h4>
+            <p class="box-card-msg">"${escapeHtml(box.dedicationMessage)}"</p>
+            <span class="box-card-from">De: ${escapeHtml(box.fromPerson)} ♡</span>
           </div>
 
           <div class="box-items-preview-row">
-            ${box.placedProducts.map(p => `<span class="b-mini-item" title="${p.name}">${p.icon}</span>`).join('')}
+            ${box.placedProducts.map(p => `<span class="b-mini-item" title="${escapeHtml(p.name)}">${escapeHtml(p.icon)}</span>`).join('')}
           </div>
 
           <div class="c-card-bottom">

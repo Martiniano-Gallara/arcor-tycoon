@@ -1,3 +1,7 @@
+import { getSharedAudioContext, hasUserInteracted } from './AudioContextHolder.ts';
+import { soundFX } from './SoundFXManager.ts';
+import { soundManager } from '../core/SoundManager.ts';
+
 /**
  * ProceduralMusic: Generador procedural de música nostálgica y ambientación rural.
  * 100% Web Audio API nativo. Cero archivos MP3 descargados.
@@ -68,8 +72,8 @@ export class ProceduralMusic {
    */
   public initContext(): void {
     if (!this.ctx) {
-      const AudioCtxClass = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
-      this.ctx = new AudioCtxClass();
+      this.ctx = getSharedAudioContext();
+      if (!this.ctx) return;
 
       // Master Gain
       this.masterGain = this.ctx.createGain();
@@ -89,7 +93,7 @@ export class ProceduralMusic {
       this.startAmbientWind();
     }
 
-    if (this.ctx && this.ctx.state === 'suspended') {
+    if (this.ctx && this.ctx.state === 'suspended' && hasUserInteracted()) {
       this.ctx.resume().catch(() => {});
     }
   }
@@ -99,6 +103,17 @@ export class ProceduralMusic {
    */
   public start(): void {
     this.initContext();
+    if (!hasUserInteracted()) {
+      const onFirstGesture = () => {
+        if (!this.isMuted && this.isPlaying) {
+          this.initContext();
+        }
+        window.removeEventListener('pointerdown', onFirstGesture);
+        window.removeEventListener('keydown', onFirstGesture);
+      };
+      window.addEventListener('pointerdown', onFirstGesture, { once: true });
+    }
+
     if (this.isPlaying) return;
     this.isPlaying = true;
 
@@ -124,10 +139,14 @@ export class ProceduralMusic {
   }
 
   public setMuted(muted: boolean): boolean {
+    if (this.isMuted === muted) return this.isMuted;
     this.isMuted = muted;
     try {
       localStorage.setItem('arcor_music_muted', String(this.isMuted));
     } catch {}
+
+    soundManager.setMuted(this.isMuted);
+    soundFX.setMuted(this.isMuted);
 
     if (this.isMuted) {
       // Silenciar: rampa suave a 0
@@ -141,7 +160,7 @@ export class ProceduralMusic {
       // Activar: inicializar contexto, reanudar si estaba suspendido y rampa suave a 1
       this.initContext();
       if (this.ctx && this.masterGain) {
-        if (this.ctx.state === 'suspended') {
+        if (this.ctx.state === 'suspended' && hasUserInteracted()) {
           this.ctx.resume().catch(() => {});
         }
         const now = this.ctx.currentTime;

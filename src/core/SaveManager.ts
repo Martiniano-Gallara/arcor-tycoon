@@ -86,6 +86,8 @@ export interface GameSaveData {
   bonOBon: number;
   cookies: number;
   cannedGoods: number;
+  savedAt?: number;
+  revision?: number;
 }
 
 const STORAGE_KEY = 'arcor_tycoon_save_v2';
@@ -185,68 +187,267 @@ export const DEFAULT_SAVE_DATA: GameSaveData = {
     musicVolume: 0.5,
     quality: 'high',
     fps60: true
-  }
+  },
+  savedAt: Date.now(),
+  revision: 1
 };
 
-export class SaveManager {
-  public static load(): GameSaveData {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (!raw) return { ...DEFAULT_SAVE_DATA };
-      const parsed = JSON.parse(raw) as Partial<GameSaveData>;
-      const data: GameSaveData = {
-        ...DEFAULT_SAVE_DATA,
-        ...parsed,
-        match3Boosters: {
-          ...DEFAULT_SAVE_DATA.match3Boosters,
-          ...(parsed.match3Boosters || {})
-        },
-        match3LevelStars: {
-          ...DEFAULT_SAVE_DATA.match3LevelStars,
-          ...(parsed.match3LevelStars || {})
-        },
-        levelHighScores: {
-          ...DEFAULT_SAVE_DATA.levelHighScores,
-          ...(parsed.levelHighScores || {})
-        },
-        settings: {
-          ...DEFAULT_SAVE_DATA.settings,
-          ...(parsed.settings || {})
-        }
-      };
+// Congelar el default para prevenir mutaciones accidentales (PER-02)
+function deepFreeze<T extends object>(obj: T): Readonly<T> {
+  Object.keys(obj).forEach(prop => {
+    const val = (obj as any)[prop];
+    if (val !== null && typeof val === 'object' && !Object.isFrozen(val)) {
+      deepFreeze(val);
+    }
+  });
+  return Object.freeze(obj);
+}
+deepFreeze(DEFAULT_SAVE_DATA);
 
-      if (data.match3CurrentLevel === undefined) data.match3CurrentLevel = 1;
-      if (data.match3Stars === undefined) data.match3Stars = 0;
-      if (data.lives === undefined) data.lives = 5;
-      if (data.maxLives === undefined) data.maxLives = 5;
-      if (!data.lastLifeLostTimestamp) data.lastLifeLostTimestamp = Date.now();
-      if (!data.unlockedMatch3Candies || data.unlockedMatch3Candies.length === 0) {
-        data.unlockedMatch3Candies = [...DEFAULT_SAVE_DATA.unlockedMatch3Candies];
-      } else {
-        // Sanitizar partida existente para que ningún dulce aparezca como desbloqueado antes de su nivel real
-        const currentLvl = data.match3CurrentLevel || 1;
-        data.unlockedMatch3Candies = data.unlockedMatch3Candies.filter(cand => {
-          const prod = ARCOR_HISTORIC_PRODUCTS[cand as CandyType];
-          return prod && prod.unlockedAtLevel <= currentLvl;
-        });
-        if (data.unlockedMatch3Candies.length === 0) {
-          data.unlockedMatch3Candies = [...DEFAULT_SAVE_DATA.unlockedMatch3Candies];
+/**
+ * Devuelve una copia limpia y desacoplada del estado por defecto (PER-02)
+ */
+export function createDefaultSaveData(): GameSaveData {
+  return JSON.parse(JSON.stringify(DEFAULT_SAVE_DATA));
+}
+
+/**
+ * Sanitiza y valida exhaustivamente cualquier objeto de guardado contra el esquema (PER-03, PER-05)
+ */
+export function sanitizeSave(raw: any): GameSaveData {
+  const def = createDefaultSaveData();
+  if (!raw || typeof raw !== 'object') {
+    return def;
+  }
+
+  // Validación numérica y bounds de dinero (PER-05)
+  let money = Number(raw.money);
+  if (!Number.isFinite(money) || money < 0) {
+    money = def.money;
+  } else {
+    money = Math.min(1e12, money);
+  }
+
+  // Validación de nivel y estrellas
+  let level = Math.floor(Number(raw.match3CurrentLevel));
+  if (!Number.isFinite(level) || level < 1 || level > 75) {
+    level = Math.max(1, Math.min(75, Number.isFinite(level) ? level : 1));
+  }
+
+  let stars = Math.floor(Number(raw.match3Stars));
+  if (!Number.isFinite(stars) || stars < 0) stars = 0;
+  stars = Math.min(225, stars);
+
+  let lives = Math.floor(Number(raw.lives));
+  if (!Number.isFinite(lives) || lives < 0) lives = 5;
+  lives = Math.min(5, Math.max(0, lives));
+
+  let year = Math.floor(Number(raw.currentYear));
+  if (!Number.isFinite(year) || year < 1951 || year > 2026) year = 1951;
+
+  let month = Math.floor(Number(raw.currentMonth));
+  if (!Number.isFinite(month) || month < 1 || month > 12) month = 6;
+
+  let rep = Number(raw.reputation);
+  if (!Number.isFinite(rep) || rep < 0) rep = 1;
+
+  // Arrays seguros
+  const completedQuests = Array.isArray(raw.completedQuests)
+    ? raw.completedQuests.filter((id: any) => typeof id === 'string')
+    : [...def.completedQuests];
+
+  const unlockedCards = Array.isArray(raw.unlockedCards)
+    ? raw.unlockedCards.filter((id: any) => typeof id === 'string')
+    : [...def.unlockedCards];
+
+  const unlockedParcels = Array.isArray(raw.unlockedParcels)
+    ? raw.unlockedParcels.filter((id: any) => typeof id === 'string')
+    : [...def.unlockedParcels];
+
+  const buildings = Array.isArray(raw.buildings)
+    ? raw.buildings.filter((b: any) => b && typeof b.id === 'string' && typeof b.typeId === 'string')
+    : [...def.buildings];
+
+  const roads = Array.isArray(raw.roads)
+    ? raw.roads.filter((r: any) => r && typeof r.gridX === 'number' && typeof r.gridZ === 'number')
+    : [...def.roads];
+
+  // Boosters acotados
+  const boosters = raw.match3Boosters && typeof raw.match3Boosters === 'object' ? raw.match3Boosters : {};
+  const clampBooster = (val: any) => Math.max(0, Math.min(99, Number.isFinite(Number(val)) ? Math.floor(Number(val)) : 3));
+
+  // Estrellas por nivel (1..75 -> 0..3)
+  const levelStars: Record<number, number> = {};
+  if (raw.match3LevelStars && typeof raw.match3LevelStars === 'object') {
+    for (const [k, v] of Object.entries(raw.match3LevelStars)) {
+      const numKey = Number(k);
+      const starVal = Number(v);
+      if (Number.isFinite(numKey) && numKey >= 1 && numKey <= 75 && Number.isFinite(starVal)) {
+        levelStars[numKey] = Math.max(0, Math.min(3, Math.floor(starVal)));
+      }
+    }
+  }
+
+  // Dulces desbloqueados acorde al nivel actual
+  let unlockedMatch3Candies = Array.isArray(raw.unlockedMatch3Candies)
+    ? raw.unlockedMatch3Candies.filter((cand: any) => {
+        const prod = ARCOR_HISTORIC_PRODUCTS[cand as CandyType];
+        return prod && prod.unlockedAtLevel <= level;
+      })
+    : [];
+  if (unlockedMatch3Candies.length === 0) {
+    unlockedMatch3Candies = [...def.unlockedMatch3Candies];
+  }
+
+  // Settings
+  const sfxVolume = Number.isFinite(Number(raw.settings?.sfxVolume)) ? Math.max(0, Math.min(1, Number(raw.settings.sfxVolume))) : 0.8;
+  const musicVolume = Number.isFinite(Number(raw.settings?.musicVolume)) ? Math.max(0, Math.min(1, Number(raw.settings.musicVolume))) : 0.5;
+  const quality = ['low', 'medium', 'high'].includes(raw.settings?.quality) ? raw.settings.quality : 'high';
+  const fps60 = typeof raw.settings?.fps60 === 'boolean' ? raw.settings.fps60 : true;
+
+  return {
+    ...def,
+    version: 2,
+    currentYear: year,
+    currentMonth: month,
+    currentEraId: typeof raw.currentEraId === 'string' ? raw.currentEraId : 'era-1951',
+    money,
+    reputation: rep,
+    completedQuests,
+    unlockedCards,
+    hasSeenPrologue: Boolean(raw.hasSeenPrologue),
+    lastActiveTimestamp: Number.isFinite(Number(raw.lastActiveTimestamp)) ? Number(raw.lastActiveTimestamp) : Date.now(),
+    buildings,
+    roads,
+    unlockedParcels,
+    match3CurrentLevel: level,
+    match3Stars: stars,
+    match3LevelStars: levelStars,
+    match3Boosters: {
+      hammer: clampBooster(boosters.hammer),
+      swap: clampBooster(boosters.swap),
+      bomb: clampBooster(boosters.bomb),
+      rocklet: clampBooster(boosters.rocklet)
+    },
+    unlockedMatch3Candies,
+    lives,
+    maxLives: 5,
+    lastLifeLostTimestamp: Number.isFinite(Number(raw.lastLifeLostTimestamp)) ? Number(raw.lastLifeLostTimestamp) : Date.now(),
+    discoveredMuseumCandies: Array.isArray(raw.discoveredMuseumCandies)
+      ? raw.discoveredMuseumCandies.filter((x: any) => typeof x === 'string')
+      : [],
+    totalQuizCorrect: Math.max(0, Math.floor(Number(raw.totalQuizCorrect) || 0)),
+    totalQuizScore: Math.max(0, Math.floor(Number(raw.totalQuizScore) || 0)),
+    settings: {
+      sfxVolume,
+      musicVolume,
+      quality,
+      fps60
+    },
+    savedAt: Number(raw.savedAt) || Date.now(),
+    revision: Number(raw.revision) || 1
+  };
+}
+
+export class SaveManager {
+  private static externalListeners: Set<(data: GameSaveData) => void> = new Set();
+  private static initializedStorageListener = false;
+  private static onSaveErrorListener?: (err: unknown) => void;
+
+  public static onSaveError(listener: (err: unknown) => void): void {
+    this.onSaveErrorListener = listener;
+  }
+
+  public static onExternalChange(listener: (data: GameSaveData) => void): () => void {
+    this.ensureStorageListener();
+    this.externalListeners.add(listener);
+    return () => this.externalListeners.delete(listener);
+  }
+
+  private static ensureStorageListener(): void {
+    if (this.initializedStorageListener || typeof window === 'undefined') return;
+    this.initializedStorageListener = true;
+
+    window.addEventListener('storage', (e) => {
+      if (e.key === STORAGE_KEY && e.newValue) {
+        try {
+          const parsed = JSON.parse(e.newValue);
+          const sanitized = sanitizeSave(parsed);
+          this.externalListeners.forEach(cb => cb(sanitized));
+        } catch (err) {
+          console.warn('[SaveManager] Cambio externo en storage contenía JSON inválido:', err);
         }
       }
+    });
+  }
 
-      return data;
+  public static load(): GameSaveData {
+    this.ensureStorageListener();
+    const BACKUP_KEY = `${STORAGE_KEY}_backup`;
+
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) {
+        // Si no hay guardado principal, verificar si hay un respaldo
+        const rawBackup = localStorage.getItem(BACKUP_KEY);
+        if (rawBackup) {
+          try {
+            return sanitizeSave(JSON.parse(rawBackup));
+          } catch {
+            // Ignorar y continuar al default
+          }
+        }
+        return createDefaultSaveData();
+      }
+
+      const parsed = JSON.parse(raw);
+      return sanitizeSave(parsed);
     } catch (e) {
-      console.warn('Error cargando partida, usando valores por defecto:', e);
-      return { ...DEFAULT_SAVE_DATA };
+      console.warn('[SaveManager] Error o archivo corrupto en guardado principal. Activando recuperación (PER-04):', e);
+      try {
+        // Archivar el guardado corrupto para no destruirlo silenciosamente
+        const corruptedRaw = localStorage.getItem(STORAGE_KEY);
+        if (corruptedRaw) {
+          localStorage.setItem(`${STORAGE_KEY}_corrupted_${Date.now()}`, corruptedRaw);
+        }
+        // Intentar rescatar el respaldo anterior
+        const backupRaw = localStorage.getItem(BACKUP_KEY);
+        if (backupRaw) {
+          const rescued = sanitizeSave(JSON.parse(backupRaw));
+          console.info('[SaveManager] Partida recuperada exitosamente desde el respaldo.');
+          return rescued;
+        }
+      } catch (backupErr) {
+        console.error('[SaveManager] Respaldo también inaccesible:', backupErr);
+      }
+      return createDefaultSaveData();
     }
   }
 
   public static save(data: GameSaveData): boolean {
+    const BACKUP_KEY = `${STORAGE_KEY}_backup`;
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+      data.savedAt = Date.now();
+      data.revision = (data.revision || 0) + 1;
+      const jsonStr = JSON.stringify(data);
+
+      // Rotación de respaldo seguro: guardar copia previa antes de sobreescribir (PER-04)
+      const current = localStorage.getItem(STORAGE_KEY);
+      if (current && current !== jsonStr) {
+        try {
+          localStorage.setItem(BACKUP_KEY, current);
+        } catch {
+          // Ignorar fallo de cuota en el respaldo
+        }
+      }
+
+      localStorage.setItem(STORAGE_KEY, jsonStr);
       return true;
     } catch (e) {
-      console.error('Error guardando en localStorage:', e);
+      console.error('[SaveManager] Error crítico guardando en localStorage:', e);
+      if (this.onSaveErrorListener) {
+        this.onSaveErrorListener(e);
+      }
       return false;
     }
   }
@@ -254,10 +455,17 @@ export class SaveManager {
   public static reset(): GameSaveData {
     try {
       localStorage.removeItem(STORAGE_KEY);
+      localStorage.removeItem(`${STORAGE_KEY}_backup`);
+      localStorage.removeItem('arcor_tycoon_save');
+      localStorage.removeItem('arcor_achievements_v1');
+      localStorage.removeItem('arcor_custom_products');
+      localStorage.removeItem('arcor_gift_boxes');
+      localStorage.removeItem('arcor_quiz_recent_ids');
+      localStorage.removeItem('arcor_quiz_daily_lives');
     } catch (e) {
-      console.error('Error al resetear partida:', e);
+      console.error('[SaveManager] Error al resetear partida:', e);
     }
-    return { ...DEFAULT_SAVE_DATA };
+    return createDefaultSaveData();
   }
 
   public static exportJSON(data: GameSaveData): string {
@@ -266,13 +474,15 @@ export class SaveManager {
 
   public static importJSON(jsonStr: string): GameSaveData | null {
     try {
-      const parsed = JSON.parse(jsonStr) as GameSaveData;
-      if (typeof parsed.currentYear === 'number' && typeof parsed.money === 'number') {
-        this.save(parsed);
-        return parsed;
+      const parsed = JSON.parse(jsonStr);
+      // Validación y saneamiento estricto (PER-03)
+      if (parsed && typeof parsed === 'object') {
+        const sanitized = sanitizeSave(parsed);
+        this.save(sanitized);
+        return sanitized;
       }
     } catch (e) {
-      console.error('JSON de guardado inválido:', e);
+      console.error('[SaveManager] JSON de guardado importado inválido:', e);
     }
     return null;
   }

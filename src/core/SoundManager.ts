@@ -1,3 +1,6 @@
+import { getSharedAudioContext } from '../audio/AudioContextHolder.ts';
+import { soundFX } from '../audio/SoundFXManager.ts';
+
 /**
  * SoundManager: Generador de audio procedural mediante Web Audio API.
  * Proporciona efectos sonoros táctiles y vintage sin requerir descarga de assets externos.
@@ -11,21 +14,23 @@ export class SoundManager {
   private ambientGain: GainNode | null = null;
 
   constructor() {
-    // AudioContext se inicializará con la primera interacción del usuario
+    try {
+      const savedMute = localStorage.getItem('arcor_music_muted');
+      if (savedMute !== null) {
+        this.isMuted = savedMute === 'true';
+      }
+    } catch {
+      this.isMuted = false;
+    }
   }
 
   private initContext(): void {
-    if (!this.ctx) {
-      const AudioCtxClass = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
-      this.ctx = new AudioCtxClass();
-    }
-    if (this.ctx.state === 'suspended') {
-      this.ctx.resume();
-    }
+    this.ctx = getSharedAudioContext();
   }
 
   public setSfxVolume(volume: number): void {
     this.sfxVolume = Math.max(0, Math.min(1, volume));
+    soundFX.setVolume(this.sfxVolume);
   }
 
   public setMusicVolume(volume: number): void {
@@ -36,7 +41,9 @@ export class SoundManager {
   }
 
   public setMuted(muted: boolean): void {
+    if (this.isMuted === muted) return;
     this.isMuted = muted;
+    soundFX.setMuted(muted);
     if (this.ambientGain && this.ctx) {
       this.ambientGain.gain.setValueAtTime(this.isMuted ? 0 : this.musicVolume * 0.15, this.ctx.currentTime);
     }

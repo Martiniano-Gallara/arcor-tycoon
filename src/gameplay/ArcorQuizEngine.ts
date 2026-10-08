@@ -39,7 +39,9 @@ export class ArcorQuizEngine {
   public onAnswerResult?: (result: AnswerResult) => void;
   public onQuizComplete?: (summary: QuizSessionSummary) => void;
 
-  private static RECENT_QUESTIONS_KEY = 'arcor_quiz_recent_ids';
+  public static readonly RECENT_QUESTIONS_KEY = 'arcor_quiz_recent_ids';
+  public static readonly DAILY_LIVES_KEY = 'arcor_quiz_daily_lives';
+  public static readonly MAX_DAILY_TRIVIA_LIVES = 5;
 
   constructor() {}
 
@@ -131,11 +133,18 @@ export class ArcorQuizEngine {
 
     if (isCorrect) {
       this.correctCount++;
-      livesAwarded = 1;
 
-      // Otorgar la vida real al sistema de Candy Crush
-      progressionState.addLives(1);
-      this.livesEarned += 1;
+      // ECO-05: Límite diario de 5 vidas recuperadas por trivia y verificar que vidas < 5
+      const currentLives = progressionState.getLives();
+      const dailyGiven = this.getDailyTriviaLivesGiven();
+      if (currentLives < 5 && dailyGiven < ArcorQuizEngine.MAX_DAILY_TRIVIA_LIVES) {
+        livesAwarded = 1;
+        progressionState.addLives(1);
+        this.livesEarned += 1;
+        this.incrementDailyTriviaLives();
+      } else {
+        livesAwarded = 0;
+      }
 
       // Puntuación: Base (100) + Bonus por tiempo restante
       const speedBonus = this.secondsLeft * 15;
@@ -328,6 +337,31 @@ export class ArcorQuizEngine {
         arr.splice(0, arr.length - 15);
       }
       localStorage.setItem(ArcorQuizEngine.RECENT_QUESTIONS_KEY, JSON.stringify(arr));
+    } catch {}
+  }
+
+  public getDailyTriviaLivesGiven(): number {
+    try {
+      const raw = localStorage.getItem(ArcorQuizEngine.DAILY_LIVES_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        const today = new Date().toISOString().slice(0, 10);
+        if (parsed.date === today && typeof parsed.count === 'number') {
+          return parsed.count;
+        }
+      }
+    } catch {}
+    return 0;
+  }
+
+  private incrementDailyTriviaLives(): void {
+    try {
+      const today = new Date().toISOString().slice(0, 10);
+      const current = this.getDailyTriviaLivesGiven();
+      localStorage.setItem(ArcorQuizEngine.DAILY_LIVES_KEY, JSON.stringify({
+        date: today,
+        count: current + 1
+      }));
     } catch {}
   }
 }

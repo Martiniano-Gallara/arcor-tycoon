@@ -18,12 +18,7 @@ export class MetaProgressionBridge {
    */
   private initIdleTick(): void {
     setInterval(() => {
-      const data = gameState.getData();
-      // Ingresos pasivos: base + según nivel de Match-3 y edificios en el diorama
-      const levelBonus = (data.match3CurrentLevel || 1) * 2;
-      const buildingBonus = (data.buildings.length || 1) * 5;
-      const incomePerSec = 15 + levelBonus + buildingBonus;
-
+      const incomePerSec = gameState.getIdleIncomePerSecond();
       gameState.addMoney(incomePerSec);
     }, 1000);
   }
@@ -32,10 +27,7 @@ export class MetaProgressionBridge {
    * Obtiene la tasa de ingresos pasivos por segundo
    */
   public getIdleRatePerSecond(): number {
-    const data = gameState.getData();
-    const levelBonus = (data.match3CurrentLevel || 1) * 2;
-    const buildingBonus = (data.buildings.length || 1) * 5;
-    return 15 + levelBonus + buildingBonus;
+    return gameState.getIdleIncomePerSecond();
   }
 
   /**
@@ -48,23 +40,38 @@ export class MetaProgressionBridge {
     milestoneEvent?: HistoricalEvent;
   } {
     const data = gameState.getData();
+    const currentMaxLevel = data.match3CurrentLevel || 1;
 
-    // 1. Acreditar dinero ganado ($ USD)
-    const earnedCoins = Math.max(coins || 0, 750 + (level * 350));
-    gameState.addMoney(earnedCoins);
+    // Validar nivel jugado (no permitir saltos arbitrarios de nivel)
+    if (level > currentMaxLevel) {
+      console.warn(`[MetaProgressionBridge] Nivel inválido: ${level} (actual: ${currentMaxLevel})`);
+      return {
+        newStarsEarned: 0,
+        coinsEarned: 0,
+        nextLevel: currentMaxLevel
+      };
+    }
 
-    // 2. Acreditar Estrellas de victoria y avanzar nivel
     const prevStars = data.match3LevelStars[level] || 0;
     const isNewClear = prevStars === 0;
 
-    gameState.setMatch3LevelStars(level, stars);
+    // 1. Acreditar dinero ganado ($ USD): Recompensa completa solo en primera victoria (ECO-02)
+    const earnedCoins = isNewClear ? Math.max(coins || 0, 750 + (level * 350)) : Math.min(coins || 0, 50);
+    if (earnedCoins > 0) {
+      gameState.addMoney(earnedCoins);
+    }
+
+    // 2. Acreditar Estrellas de victoria y avanzar nivel
+    if (stars > prevStars) {
+      gameState.setMatch3LevelStars(level, stars);
+    }
 
     if (isNewClear) {
       gameState.addMatch3Stars(1);
     }
 
-    // Siempre avanzamos al nivel siguiente si ganamos el nivel actual
-    if (level >= (data.match3CurrentLevel || 1)) {
+    // Avanzamos al nivel siguiente si ganamos el nivel actual alcanzado, con tope en nivel 75 (PRG-02)
+    if (level === currentMaxLevel && level < 75) {
       gameState.setMatch3Level(level + 1);
     }
 
@@ -81,11 +88,15 @@ export class MetaProgressionBridge {
       if (matchedEvent) break;
     }
 
+    let newlyUnlockedMilestone: HistoricalEvent | undefined;
     if (matchedEvent) {
-      gameState.questManager.completeMilestoneForLevel(level);
-      this.applyAutomatedFactoryExpansion(matchedEvent);
-      if (this.onMilestoneUnlocked) {
-        this.onMilestoneUnlocked(matchedEvent);
+      const completed = gameState.questManager.completeMilestoneForLevel(level);
+      if (completed) {
+        newlyUnlockedMilestone = completed;
+        this.applyAutomatedFactoryExpansion(completed);
+        if (this.onMilestoneUnlocked) {
+          this.onMilestoneUnlocked(completed);
+        }
       }
     }
 
@@ -93,7 +104,7 @@ export class MetaProgressionBridge {
       newStarsEarned: isNewClear ? 1 : 0,
       coinsEarned: earnedCoins,
       nextLevel: gameState.getData().match3CurrentLevel,
-      milestoneEvent: matchedEvent || undefined
+      milestoneEvent: newlyUnlockedMilestone
     };
   }
 
@@ -181,7 +192,8 @@ export class MetaProgressionBridge {
       allowedSet.add(newUnlockedProduct.type);
     }
 
-    const desiredVarietyCount = safeLevel < 10 ? 4 : (safeLevel > 55 ? 6 : 5);
+    // Variedad equilibrada (4 colores al inicio, máximo 5 colores para mantener fluidez y combos)
+    const desiredVarietyCount = safeLevel < 10 ? 4 : 5;
 
     // Rellenar desde unlockedTypes rotando para asegurar frescura y variedad sin filtrar futuros
     const offset = safeLevel % unlockedTypes.length;
@@ -199,21 +211,17 @@ export class MetaProgressionBridge {
 
     const allowedCandies = Array.from(allowedSet);
 
-    // Movimientos generosos y cómodos: 26 a 32 movimientos para una partida completa y satisfactoria
-    const baseMoves = Math.min(32, Math.max(26, Math.round(26 + (safeLevel - 1) * (6 / 74))));
-    const moves = levelDef.isSpecialMilestone ? baseMoves + 3 : baseMoves;
+    // Movimientos equilibrados: 28 a 38 movimientos para progresión justa (PRG-01)
+    const baseMoves = Math.min(38, Math.max(28, Math.round(28 + (safeLevel - 1) * (10 / 74))));
+    const moves = levelDef.isSpecialMilestone ? baseMoves + 4 : baseMoves;
 
-    // Cantidades requeridas sustanciales (hacen que los niveles duren más y no se resuelvan en 6 movimientos)
-    // Nivel 1: ~24 y 20 (Total 44)
-    // Nivel 10: ~28, 24, 18 (Total 70)
-    // Nivel 35: ~36, 30, 22 (Total 88)
-    // Nivel 75: ~52, 44, 34 (Total 130)
-    const baseTargetQty = Math.round(24 + (safeLevel - 1) * (28 / 74));
+    // Cantidades requeridas calibradas para ritmo justo (de ~32 piezas totales en Nivel 1 a ~76 en Nivel 75)
+    const baseTargetQty = Math.round(18 + (safeLevel - 1) * (14 / 74));
 
     const objectives: LevelObjective[] = targetTypes.map((t, idx) => {
       let qty = baseTargetQty;
-      if (idx === 1) qty = Math.max(16, Math.round(baseTargetQty * 0.82));
-      else if (idx === 2) qty = Math.max(14, Math.round(baseTargetQty * 0.65));
+      if (idx === 1) qty = Math.max(12, Math.round(baseTargetQty * 0.8));
+      else if (idx === 2) qty = Math.max(10, Math.round(baseTargetQty * 0.65));
       const def = candyDefs[t] || { icon: '🍬', name: t, year: 1951 };
       return {
         type: t,

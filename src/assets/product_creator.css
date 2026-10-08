@@ -247,7 +247,7 @@
 .taller-stage-viewport {
   position: absolute;
   inset: 0;
-  background-image: url('/taller_podium_stage.jpg');
+  background-image: url('./taller_podium_stage.jpg');
   background-size: cover;
   background-position: center 60%;
   filter: brightness(1.05) contrast(1.08);

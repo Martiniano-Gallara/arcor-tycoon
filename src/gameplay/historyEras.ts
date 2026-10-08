@@ -539,9 +539,9 @@ export const ERAS_DEFINITION: EraDefinition[] = [
           unlockedLore: 'Las marcas de Arcor se integraron con líderes mundiales para democratizar alimentos nutritivos y de calidad global.'
         },
         quest: {
-          objective: 'Supera el Nivel 10 de Arcor Crush para sellar las grandes alianzas internacionales.',
+          objective: 'Supera el Nivel 65 de Arcor Crush para sellar las grandes alianzas internacionales.',
           targetResource: 'crush_level',
-          targetAmount: 10,
+          targetAmount: 65,
           rewardCoins: 4200,
           rewardReputation: 1200
         },
@@ -562,9 +562,9 @@ export const ERAS_DEFINITION: EraDefinition[] = [
           unlockedLore: 'Con tecnología de última generación, la planta de Luanda abastece a toda la región con Bon o Bon, galletitas y golosinas elaboradas localmente.'
         },
         quest: {
-          objective: 'Supera el Nivel 11 de Arcor Crush para inaugurar la planta de Angola y expandir la sustentabilidad.',
+          objective: 'Supera el Nivel 71 de Arcor Crush para inaugurar la planta de Angola y expandir la sustentabilidad.',
           targetResource: 'crush_level',
-          targetAmount: 11,
+          targetAmount: 71,
           rewardCoins: 4600,
           rewardReputation: 1500
         },
@@ -585,9 +585,9 @@ export const ERAS_DEFINITION: EraDefinition[] = [
           unlockedLore: 'El sueño de Don Fulvio y sus pioneros en 1951 es hoy una realidad gigante que enorgullece a toda la Argentina y al mundo.'
         },
         quest: {
-          objective: 'Supera el Nivel 12 de Arcor Crush para coronar el 75° Aniversario de Arcor y completar el imperio dulce.',
+          objective: 'Supera el Nivel 75 de Arcor Crush para coronar el 75° Aniversario de Arcor y completar el imperio dulce.',
           targetResource: 'crush_level',
-          targetAmount: 12,
+          targetAmount: 75,
           rewardCoins: 5000,
           rewardReputation: 2000
         },

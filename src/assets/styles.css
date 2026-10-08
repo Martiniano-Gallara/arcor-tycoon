@@ -1,5 +1,3 @@
-@import './product_creator.css';
-
 /* ==========================================================================
    ARCOR TYCOON: EL DULCE IMPERIO - DESIGN SYSTEM (MOBILE-FIRST)
    ========================================================================== */
@@ -7213,7 +7211,7 @@ button {
   inset: 0;
   width: 100%;
   height: 100%;
-  background: url('/arcor_crush_bg.jpg') center center / cover no-repeat;
+  background: url('../../public/arcor_crush_bg.jpg') center center / cover no-repeat;
   pointer-events: none;
   z-index: 1;
 }
@@ -9706,7 +9704,7 @@ button {
 .saga-ambient-backdrop {
   position: absolute;
   inset: -30px;
-  background: url('/saga_zone1_bg.jpg') center top / cover no-repeat;
+  background: url('../../public/saga_zone1_bg.jpg') center top / cover no-repeat;
   filter: blur(40px) brightness(0.35);
   pointer-events: none;
   z-index: 1;
@@ -13419,7 +13417,7 @@ button {
   align-items: flex-start;
   background: 
     radial-gradient(ellipse at 50% 20%, rgba(55, 22, 9, 0.65) 0%, rgba(16, 6, 2, 0.92) 80%),
-    url('/workshop_bg.jpg') center center / cover no-repeat fixed;
+    url('./workshop_bg.jpg') center center / cover no-repeat fixed;
   box-sizing: border-box;
 }
 

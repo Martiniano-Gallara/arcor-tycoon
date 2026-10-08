@@ -168,8 +168,6 @@ export class PreLevelModal {
         soundManager.playClick();
         if (this.onOpenQuizRequested) {
           this.onOpenQuizRequested();
-        } else {
-          progressionState.refillLives();
         }
         this.updatePlayButton();
         return;

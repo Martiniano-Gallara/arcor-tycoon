@@ -177,6 +177,7 @@ export class Match3Engine {
   public isGameOver: boolean = false;
   public isVictory: boolean = false;
   public comboStreak: number = 0;
+  public extraMovesPurchased: number = 0;
 
   // Control de concurrencia y watchdog para evitar bloqueos ("no se trabe")
   private activeCascadeToken: number = 0;
@@ -187,8 +188,12 @@ export class Match3Engine {
   public onMatchTriggered?: (pieces: CandyPiece[], combo: number) => void;
   public onSpecialTriggered?: (type: SpecialType, row: number, col: number) => void;
   public onScoreFloat?: (text: string, x: number, y: number, color?: string) => void;
-  public onLevelWon?: (stars: number, score: number, coins: number) => void;
+  public onLevelWon?: (stars: number, score: number, coins: number, level?: number) => void;
   public onLevelLost?: () => void;
+
+  private inBounds(r: number, c: number): boolean {
+    return r >= 0 && r < Match3Engine.ROWS && c >= 0 && c < Match3Engine.COLS;
+  }
 
   constructor() {
     this.initEmptyGrid();
@@ -241,6 +246,7 @@ export class Match3Engine {
     this.isVictory = false;
     this.comboStreak = 0;
     this.isBusy = false;
+    this.extraMovesPurchased = 0;
 
     this.initEmptyGrid();
     this.populateInitialBoard();
@@ -248,13 +254,22 @@ export class Match3Engine {
   }
 
   /**
-   * Añade movimientos adicionales (por ejemplo para dar una segunda oportunidad)
+   * Añade movimientos adicionales (máximo 1 compra por intento de nivel)
    */
-  public addExtraMoves(count: number): void {
+  public addExtraMoves(count: number): boolean {
+    if (this.extraMovesPurchased >= 1) {
+      return false;
+    }
+    this.extraMovesPurchased++;
     this.movesRemaining += count;
     this.isGameOver = false;
     this.isBusy = false;
     if (this.onStateChanged) this.onStateChanged();
+    return true;
+  }
+
+  public canAddExtraMoves(): boolean {
+    return this.extraMovesPurchased === 0;
   }
 
   private getRandomCandyType(): CandyType {
@@ -307,6 +322,7 @@ export class Match3Engine {
    */
   public trySwap(r1: number, c1: number, r2: number, c2: number): boolean {
     if (this.isBusy || this.isGameOver) return false;
+    if (!this.inBounds(r1, c1) || !this.inBounds(r2, c2)) return false;
 
     // Verificar adyacencia
     const dist = Math.abs(r1 - r2) + Math.abs(c1 - c2);
@@ -751,9 +767,13 @@ export class Match3Engine {
 
       soundFX.playLevelWin();
 
+      const wonLevel = this.currentLevel;
+      const wonToken = this.activeCascadeToken;
+
       setTimeout(() => {
+        if (wonToken !== this.activeCascadeToken || wonLevel !== this.currentLevel) return;
         if (this.onLevelWon) {
-          this.onLevelWon(stars, this.score, bonusCoins);
+          this.onLevelWon(stars, this.score, bonusCoins, wonLevel);
         }
       }, 700);
 
@@ -776,6 +796,7 @@ export class Match3Engine {
   /** Martillo de Caramelo: rompe 1 casilla puntual */
   public useBoosterHammer(row: number, col: number): boolean {
     if (this.isBusy || this.isGameOver) return false;
+    if (!this.inBounds(row, col)) return false;
     const piece = this.grid[row][col];
     if (!piece) return false;
 
@@ -798,6 +819,7 @@ export class Match3Engine {
   /** Guante Intercambiador: cambia 2 piezas contiguas sin gastar movimiento */
   public useBoosterSwap(r1: number, c1: number, r2: number, c2: number): boolean {
     if (this.isBusy || this.isGameOver) return false;
+    if (!this.inBounds(r1, c1) || !this.inBounds(r2, c2)) return false;
     const dist = Math.abs(r1 - r2) + Math.abs(c1 - c2);
     if (dist !== 1) return false;
 
@@ -810,6 +832,7 @@ export class Match3Engine {
   /** Generar Mega Rocklet instantáneo */
   public useBoosterMegaRocklet(row: number, col: number): boolean {
     if (this.isBusy || this.isGameOver) return false;
+    if (!this.inBounds(row, col)) return false;
     const piece = this.grid[row][col];
     if (!piece) return false;
 
@@ -831,8 +854,8 @@ export class Match3Engine {
   /**
    * Encuentra un posible movimiento válido en el tablero actual para guiar al jugador
    */
-  public findPossibleMove(): { r1: number; c1: number; r2: number; c2: number } | null {
-    if (this.isBusy || this.isGameOver) return null;
+  public findPossibleMove(ignoreBusy: boolean = false): { r1: number; c1: number; r2: number; c2: number } | null {
+    if ((!ignoreBusy && this.isBusy) || this.isGameOver) return null;
 
     // Verificar intercambios horizontales
     for (let r = 0; r < Match3Engine.ROWS; r++) {
@@ -933,7 +956,7 @@ export class Match3Engine {
       }
 
       const matches = this.findAllMatches();
-      const move = this.findPossibleMove();
+      const move = this.findPossibleMove(true);
       if (matches.length === 0 && move !== null) {
         foundValid = true;
         break;
