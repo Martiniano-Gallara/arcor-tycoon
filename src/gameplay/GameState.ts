@@ -4,8 +4,6 @@ import { QuestManager } from './QuestManager.ts';
 import { LogisticsSystem, DeliveryContract } from './LogisticsSystem.ts';
 import { soundManager } from '../core/SoundManager.ts';
 import { proceduralMusic } from '../audio/ProceduralMusic.ts';
-import { achievementsManager } from './AchievementsManager.ts';
-import { customizationManager } from './CustomizationManager.ts';
 
 export type StateListener = (state: GameSaveData) => void;
 
@@ -23,12 +21,18 @@ for (let lvl = 1; lvl <= 75; lvl++) {
 export class GameState {
   private data: GameSaveData;
   private listeners: Set<StateListener> = new Set();
+  private resetCallbacks: Set<() => void> = new Set();
   public questManager: QuestManager;
   public logisticsSystem: LogisticsSystem;
 
   private passiveIncomeTimer: number = 0;
   private saveDebounceTimer: any = null;
   public onFactoryProduced?: (building: PlacedBuildingSave, productKey: string, amount: number) => void;
+
+  public onReset(cb: () => void): () => void {
+    this.resetCallbacks.add(cb);
+    return () => this.resetCallbacks.delete(cb);
+  }
 
   constructor() {
     this.data = SaveManager.load();
@@ -272,8 +276,13 @@ export class GameState {
   public resetGame(): void {
     this.data = createDefaultSaveData();
     SaveManager.reset();
-    achievementsManager.reset();
-    customizationManager.reset();
+    this.resetCallbacks.forEach(cb => {
+      try {
+        cb();
+      } catch (e) {
+        console.warn('Error during reset callback execution:', e);
+      }
+    });
     SaveManager.save(this.data);
     this.notify({ immediate: true });
   }

@@ -7,7 +7,6 @@
  * 3. Desbloquear nuevos packagings, stickers, colores y estilos según su progreso en Candy Crush y Quiz.
  */
 
-import { progressionState } from './ProgressionState.ts';
 import { gameState } from './GameState.ts';
 
 // ---------------------------------------------------------------------------
@@ -399,6 +398,15 @@ export class CustomizationManager {
 
   private constructor() {
     this.loadFromStorage();
+    if (typeof gameState !== 'undefined' && gameState?.onReset) {
+      gameState.onReset(() => this.reset());
+    } else {
+      setTimeout(() => {
+        if (typeof gameState !== 'undefined' && gameState?.onReset) {
+          gameState.onReset(() => this.reset());
+        }
+      }, 0);
+    }
   }
 
   public static getInstance(): CustomizationManager {
@@ -491,6 +499,11 @@ export class CustomizationManager {
     this.saveToStorage();
   }
 
+  private getCurrentLevel(): number {
+    if (typeof gameState === 'undefined' || !gameState) return 1;
+    return (gameState.getData() as any)?.match3CurrentLevel || 1;
+  }
+
   // =========================================================================
   // VERIFICACIÓN DE DESBLOQUEOS
   // =========================================================================
@@ -499,7 +512,7 @@ export class CustomizationManager {
     const info = PACKAGING_TYPES_INFO[type];
     if (!info || info.unlockedByDefault) return { isUnlocked: true };
 
-    const currentLevel = progressionState.getCurrentLevel();
+    const currentLevel = this.getCurrentLevel();
     if (info.requiredLevel && currentLevel >= info.requiredLevel) {
       return { isUnlocked: true };
     }
@@ -513,7 +526,7 @@ export class CustomizationManager {
   public isColorThemeUnlocked(theme: ColorTheme): { isUnlocked: boolean; requirementText?: string } {
     if (theme.unlockedByDefault) return { isUnlocked: true };
 
-    const currentLevel = progressionState.getCurrentLevel();
+    const currentLevel = this.getCurrentLevel();
     if (theme.requiredLevel && currentLevel >= theme.requiredLevel) {
       return { isUnlocked: true };
     }
@@ -527,7 +540,7 @@ export class CustomizationManager {
   public isStickerUnlocked(sticker: StickerBadge): { isUnlocked: boolean; requirementText?: string } {
     if (sticker.unlockedByDefault) return { isUnlocked: true };
 
-    const currentLevel = progressionState.getCurrentLevel();
+    const currentLevel = this.getCurrentLevel();
     if (sticker.requiredLevel && currentLevel >= sticker.requiredLevel) {
       return { isUnlocked: true };
     }
@@ -553,7 +566,7 @@ export class CustomizationManager {
   public isBoxDesignUnlocked(box: BoxDesign): { isUnlocked: boolean; requirementText?: string } {
     if (box.unlockedByDefault) return { isUnlocked: true };
 
-    const currentLevel = progressionState.getCurrentLevel();
+    const currentLevel = this.getCurrentLevel();
     if (box.requiredLevel && currentLevel >= box.requiredLevel) {
       return { isUnlocked: true };
     }

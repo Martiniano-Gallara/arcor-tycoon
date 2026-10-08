@@ -161,6 +161,15 @@ export class AchievementsManager {
 
   private constructor() {
     this.load();
+    if (typeof gameState !== 'undefined' && gameState?.onReset) {
+      gameState.onReset(() => this.reset());
+    } else {
+      setTimeout(() => {
+        if (typeof gameState !== 'undefined' && gameState?.onReset) {
+          gameState.onReset(() => this.reset());
+        }
+      }, 0);
+    }
   }
 
   public static getInstance(): AchievementsManager {

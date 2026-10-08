@@ -7211,7 +7211,7 @@ button {
   inset: 0;
   width: 100%;
   height: 100%;
-  background: url('../../public/arcor_crush_bg.jpg') center center / cover no-repeat;
+  background: url('/arcor_crush_bg.jpg') center center / cover no-repeat;
   pointer-events: none;
   z-index: 1;
 }
@@ -9704,7 +9704,7 @@ button {
 .saga-ambient-backdrop {
   position: absolute;
   inset: -30px;
-  background: url('../../public/saga_zone1_bg.jpg') center top / cover no-repeat;
+  background: url('/saga_zone1_bg.jpg') center top / cover no-repeat;
   filter: blur(40px) brightness(0.35);
   pointer-events: none;
   z-index: 1;

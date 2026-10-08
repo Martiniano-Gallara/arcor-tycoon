@@ -202,7 +202,9 @@ export class ProgressionState {
   private timerHandle: number | null = null;
 
   private constructor() {
-    this.checkRegeneration();
+    setTimeout(() => {
+      this.checkRegeneration();
+    }, 0);
     this.timerHandle = window.setInterval(() => {
       this.checkRegeneration();
     }, 1000);
@@ -361,19 +363,25 @@ export class ProgressionState {
   }
 
   private checkRegeneration(): void {
-    const data = gameState.getData() as any;
-    const currentLives = data.lives ?? 5;
-    if (currentLives >= ProgressionState.MAX_LIVES) return;
+    if (typeof gameState === 'undefined' || !gameState) return;
+    try {
+      const data = gameState.getData() as any;
+      if (!data) return;
+      const currentLives = data.lives ?? 5;
+      if (currentLives >= ProgressionState.MAX_LIVES) return;
 
-    const lastTime = data.lastLifeLostTimestamp || Date.now();
-    const elapsedSeconds = Math.floor((Date.now() - lastTime) / 1000);
+      const lastTime = data.lastLifeLostTimestamp || Date.now();
+      const elapsedSeconds = Math.floor((Date.now() - lastTime) / 1000);
 
-    if (elapsedSeconds >= ProgressionState.REGEN_TIME_SECONDS) {
-      const recovered = Math.floor(elapsedSeconds / ProgressionState.REGEN_TIME_SECONDS);
-      data.lives = Math.min(ProgressionState.MAX_LIVES, currentLives + recovered);
-      data.lastLifeLostTimestamp = Date.now() - ((elapsedSeconds % ProgressionState.REGEN_TIME_SECONDS) * 1000);
-      gameState.notify();
-      this.notify();
+      if (elapsedSeconds >= ProgressionState.REGEN_TIME_SECONDS) {
+        const recovered = Math.floor(elapsedSeconds / ProgressionState.REGEN_TIME_SECONDS);
+        data.lives = Math.min(ProgressionState.MAX_LIVES, currentLives + recovered);
+        data.lastLifeLostTimestamp = Date.now() - ((elapsedSeconds % ProgressionState.REGEN_TIME_SECONDS) * 1000);
+        gameState.notify();
+        this.notify();
+      }
+    } catch {
+      // Guard against early lifecycle invocation
     }
   }
 
